@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMNLP 2026 · 每天的交通、地图与购票步骤</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{color-scheme:light;--ink:#173c3a;--muted:#536561;--paper:#f6f5ef;--line:#d6ded5;--active:#0b6e68;--card:#fff;--walk:#616e69;--tram:#a96a07;--metro:#268445;--bus:#216dc3;--taxi:#aa4052}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:1320px;margin:auto;padding:24px 26px 60px}button,input,select{font:inherit}button{cursor:pointer}button,a,select{touch-action:manipulation}a{color:#09675e;text-underline-offset:3px}h1{font-size:29px;line-height:1.35;margin:8px 0 10px;font-weight:650}h2{font-size:23px;margin:8px 0 12px;line-height:1.4}h3{font-size:18px;margin:0 0 10px;line-height:1.45}h4{font-size:16px;margin:0 0 6px}p{margin:6px 0}.eyebrow{font-size:12px;letter-spacing:1.5px;color:var(--muted)}.sub{font-size:14px;color:var(--muted);max-width:1000px}.print{float:right;padding:6px 13px;border:1px solid var(--line);background:transparent;border-radius:7px;font-size:13px}.days{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.days button{border:1px solid var(--line);background:transparent;border-radius:9px;padding:8px 16px;text-align:left;color:var(--ink)}.days button[aria-pressed=true]{background:var(--active);border-color:var(--active);color:#fff}.days span{display:block;font-size:12px;opacity:.85}.daybar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.daybar h2{margin-top:0}.jumps{display:flex;flex-wrap:wrap;gap:8px 15px;font-size:13px;margin:3px 0 18px}.chooser{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px;margin:10px 0 16px}.chooser label{font-size:14px;font-weight:600}.chooser select{width:100%;padding:10px 12px;border:1px solid #9aaea7;border-radius:8px;background:#fff;color:var(--ink);font-size:15px;min-height:44px}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:25px;align-items:start}.map-panel{position:sticky;top:16px}.map-title{font-size:16px;font-weight:600;margin-bottom:8px}#map{height:490px;border-radius:12px;background:#e2e7dc;isolation:isolate}.stages{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.stages button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;font-size:12px;padding:6px 10px;min-height:34px}.stages button[aria-pressed=true]{background:var(--active);color:white;border-color:var(--active)}.legend{display:flex;gap:8px 14px;flex-wrap:wrap;font-size:12px;margin:9px 0}.legend i{display:inline-block;vertical-align:middle;width:23px;border-top:3px solid;margin-right:5px}.legend .walk{color:var(--walk);border-top-style:dotted}.legend .tram{color:var(--tram)}.legend .metro{color:var(--metro)}.legend .bus{color:var(--bus)}.legend .taxi{color:var(--taxi);border-top-style:dashed}.caption,.sources{font-size:12px;color:var(--muted)}.map-status{font-size:13px;color:#864516}.map-number{min-width:28px!important;width:auto!important;white-space:nowrap;line-height:26px;text-align:center;border:2px solid #fff;background:var(--active);box-shadow:0 1px 5px #0005;color:#fff;border-radius:20px;font-size:12px;font-weight:600;padding:0 5px}.leaflet-popup-content{font:14px/1.7 -apple-system,"PingFang SC",sans-serif}.leaflet-control-attribution{font-size:10px}.route-head{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:15px}.route-head h3{font-size:20px}.meta{font-size:14px;display:flex;flex-wrap:wrap;gap:6px 18px}.fare{font-size:14px;color:var(--muted);margin-top:8px}.stage{border-bottom:1px solid var(--line);padding:14px 0}.stage:first-child{padding-top:0}.stage-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:7px}.mode{font-size:11px;font-weight:600;letter-spacing:.4px;border-radius:4px;padding:1px 6px;background:#e4e9e1}.stops{font-size:12px;color:var(--muted);margin:5px 0 8px}.steps{padding-left:21px;margin:5px 0;font-size:14px}.steps li{padding-left:3px;margin-bottom:8px}.stage-actions{display:flex;flex-wrap:wrap;gap:10px;font-size:12px}.stage-actions button,.overview-action,.route-link{border:0;background:transparent;color:#09675e;padding:0;text-decoration:underline;text-underline-offset:3px;font-size:inherit;text-align:left}.section{margin-top:34px;border-top:1px solid var(--line);padding-top:22px}.section h2{font-size:21px}.timeline{display:grid;grid-template-columns:1fr 1fr;gap:0 25px}.event{display:grid;grid-template-columns:98px minmax(0,1fr);gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.event time{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}.event h3{font-size:16px;margin:0 0 5px}.event p{font-size:14px;color:var(--muted)}.event-actions{display:flex;gap:10px;flex-wrap:wrap;font-size:12px}.notes{display:grid;grid-template-columns:1fr 1fr;gap:14px 25px}.note{border-left:3px solid #b28b4c;padding:2px 0 2px 13px}.note h3{font-size:15px;margin:0 0 5px}.note p{font-size:14px;color:var(--muted)}.ticket{padding:16px 0;border-bottom:1px solid var(--line)}.ticket ol{padding-left:22px;font-size:14px}.ticket li{margin:8px 0}.ticket-links{display:flex;flex-wrap:wrap;gap:7px 17px;font-size:13px}.daily-note{font-size:13px;color:var(--muted);margin:10px 0}.overview-card{padding:10px 0}.overview-card p{font-size:14px;color:var(--muted)}.overview-card .route-list{padding-left:22px}.overview-card li{margin:10px 0}.footer{font-size:12px;color:var(--muted);margin-top:25px}.print-all{display:none}.all-routes{padding:14px 0}.all-routes summary{font-weight:600;cursor:pointer}.all-routes .route-head{margin-top:22px}.sources{margin-top:14px}.sources a{margin-right:12px}.highlight{padding:10px 14px;background:#ece8dc;border-left:3px solid #a47b40;font-size:13px;margin-top:14px}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #367caa;outline-offset:3px}
+@media(max-width:850px){main{padding:19px 16px 45px}h1{font-size:25px}.layout,.timeline,.notes{grid-template-columns:1fr}.map-panel{position:static}#map{height:390px}.days button{flex:1 1 27%;padding:7px 12px}.daybar{display:block}.chooser{grid-template-columns:1fr;gap:4px}.print{float:none;margin-bottom:9px}.section{margin-top:26px}.steps{font-size:15px}}@media(max-width:400px){main{padding:16px 11px}h1{font-size:23px}#map{height:340px}.event{grid-template-columns:84px minmax(0,1fr);gap:9px}.event time{font-size:12px}.stages button{min-height:40px}.chooser select{font-size:16px}.days button{min-height:60px}}
+@media print{body{background:white;color:#111}main{padding:0}header,.days,.daybar,.jumps,.chooser,.layout,.section,.footer,.print{display:none}.print-all{display:block}.print-all h1{display:block}.print-day{break-before:page}.print-day:first-of-type{break-before:auto}.print-day h2{display:block}.notes,.timeline{display:block}.event,.note,.stage,.ticket,.route-head{break-inside:avoid}.route-head{margin-top:22px}.stage-actions,.event-actions,.ticket-links{display:none}a{color:inherit}}
+</style>
+</head>
+<body><main>
+<header><button class="print" onclick="window.print()">打印六天完整手册 / 存为 PDF</button><div class="eyebrow">22–27 OCTOBER 2026 · EMNLP</div><h1>布达佩斯 × 维也纳 · 逐段出行手册</h1><p class="sub">从哪里上车、坐哪个方向、几站下车、怎么付钱，都放进当天。先选日期，再选你正在走的路段；地图与右侧步骤一起切换。</p></header>
+<nav class="days" id="daynav" aria-label="选择日期"></nav>
+<div class="daybar"><div><div class="eyebrow" id="daydate"></div><h2 id="daytitle"></h2></div><div class="sub" id="daywalk"></div></div>
+<nav class="jumps" aria-label="当天内容"><a href="#travel">逐段交通与地图</a><a href="#schedule">当天时间表</a><a href="#tickets">今天怎么买票</a><a href="#attention">今天的注意事项</a></nav>
+<section id="travel"><div class="chooser"><label for="legselect">你正在走哪一段</label><select id="legselect"></select></div><div class="layout"><div class="map-panel"><div class="map-title" id="maptitle"></div><div id="map" aria-label="所选路段的上车站、换乘站、下车站和线路连线"></div><div class="stages" id="mapstages" aria-label="分段放大"></div><div class="legend"><span><i class="walk"></i>步行</span><span><i class="tram"></i>电车</span><span><i class="metro"></i>地铁</span><span><i class="bus"></i>巴士/接驳</span><span><i class="taxi"></i>出租车</span></div><p class="caption" id="mapcaption"></p><p class="map-status" id="mapstatus" role="status"></p></div><div id="routedetail" aria-live="polite"></div></div></section>
+<section class="section" id="schedule"><h2>当天时间表</h2><p class="daily-note" id="daynote"></p><div class="timeline" id="events"></div></section>
+<section class="section" id="tickets"><h2>今天怎么买票、怎么付款</h2><div id="ticketcontent"></div></section>
+<section class="section" id="attention"><h2>今天的注意事项</h2><div class="notes" id="notes"></div><div class="highlight" id="daylimits"></div></section>
+<section class="section"><details class="all-routes" id="allroutes"><summary>展开今天所有交通步骤，连续阅读</summary><div id="allroutecontent"></div></details></section>
+<div class="footer">交通说明核对至 2026-10-16；部分景点票价沿用 10 月 14 日的官网公开价，未锁价。距离和用时为规划估计，不含实时路况。点位为站点/建筑附近位置，出口号、精确站台、列车股道与展馆门以当天标识及票面为准。底图 © OpenStreetMap contributors；地图需联网，没有购票或代叫车。</div>
+<div class="print-all" id="printall"></div>
+</main>
+<script>const trip = {
+  checked: '2026-10-14',
+  places: {
+    hotel: {name:'ibis Styles Budapest City',local:'Soroksári út 12, Budapest',ll:[47.479285,19.068385]},
+    market:{name:'中央大市场',local:'Central Market Hall, Budapest',ll:[47.4871,19.0584]},
+    liberty:{name:'自由桥',local:'Liberty Bridge, Budapest',ll:[47.4858,19.0553]},
+    vigado:{name:'多瑙河步道 / Vigadó tér',local:'Vigadó tér, Budapest',ll:[47.4956,19.0495]},
+    dock:{name:'Legenda 7 号码头',local:'Legenda City Cruises, Dock 7, Jane Haining rakpart, Budapest',ll:[47.4933,19.0511]},
+    bastion:{name:'渔人堡 / 马加什教堂',local:'Fisherman’s Bastion, Budapest',ll:[47.50233,19.03493]},
+    castle:{name:'布达王宫外部庭院',local:'Buda Castle, Budapest',ll:[47.4962,19.0396]},
+    chain:{name:'链子桥',local:'Széchenyi Chain Bridge, Budapest',ll:[47.4989,19.0436]},
+    hungexpo:{name:'EMNLP · HUNGEXPO',local:'HUNGEXPO, Albertirsai út 10, Budapest',ll:[47.4938,19.1225]},
+    heroes:{name:'英雄广场',local:'Heroes Square, Budapest',ll:[47.5149,19.0779]},
+    vajda:{name:'沃伊达奇城堡外观',local:'Vajdahunyad Castle, Budapest',ll:[47.5150,19.0830]},
+    bath:{name:'塞切尼温泉',local:'Széchenyi Thermal Bath, Budapest',ll:[47.5187,19.0811]},
+    parliament:{name:'国会大厦游客中心',local:'Hungarian Parliament Visitor Centre, Budapest',ll:[47.5085,19.0452]},
+    shoes:{name:'多瑙河岸的鞋子',local:'Shoes on the Danube Bank, Budapest',ll:[47.5040,19.0448]},
+    basilica:{name:'圣伊什特万大教堂',local:'St Stephen’s Basilica, Budapest',ll:[47.5009,19.0539]},
+    airport:{name:'布达佩斯机场 T2',local:'Budapest Ferenc Liszt International Airport Terminal 2',ll:[47.4302,19.2620]},
+    kelenfold:{name:'Budapest-Kelenföld',local:'Budapest-Kelenföld railway station',ll:[47.4645,19.0203]},
+    hbf:{name:'Wien Hauptbahnhof',local:'Wien Hauptbahnhof',ll:[48.1850,16.3779]},
+    belvedere:{name:'上美景宫',local:'Upper Belvedere, Vienna',ll:[48.1915,16.3809]},
+    karl:{name:'卡尔教堂外观',local:'Karlskirche, Vienna',ll:[48.1982,16.3713]},
+    opera:{name:'维也纳国家歌剧院外观',local:'Vienna State Opera',ll:[48.2028,16.3692]},
+    hofburg:{name:'霍夫堡 / 米夏埃尔广场',local:'Michaelerplatz, Vienna',ll:[48.2078,16.3661]},
+    stephans:{name:'圣斯蒂芬大教堂',local:'Stephansdom, Vienna',ll:[48.20849,16.37317]}
+  },
+  days: [
+    {id:'22',date:'10 月 22 日 · 周四',title:'抵达，佩斯河岸与夜游船',city:'Budapest',color:'#0b6e68',walk:'步行约 4–6 km，可用 2 路电车缩短',note:'按你说的 22 日出发、截图 CA719 当日 07:00 抵达规划。出发日期在截图上方被裁切，需以机票订单再次确认。上午只寄存行李，房间是否可提前入住由酒店决定。',
+      route:['hotel','market','liberty','hotel','vigado','dock','hotel'],
+      segments:[['hotel','market','transit'],['market','liberty','walk'],['liberty','hotel','transit'],['hotel','vigado','transit'],['vigado','dock','walk'],['dock','hotel','transit']],
+      nav:['market','liberty'],
+      events:[
+        ['07:00–09:30','airport','抵达与入境','预留入境、取行李和交通时间。省力选机场 T2A/T2B 外 Főtaxi 柜台；公共交通选 100E 到 Kálvin tér，再短程出租车或步行至 Fővám tér 换 2 路电车。'],
+        ['09:30–10:30','hotel','寄存行李、早餐','不要按早上一定有房间来安排。补水，给夜航后的体力留余地。'],
+        ['11:00–12:00','market','中央大市场','看彩色屋顶、香肠和红椒摊；免费入内。今天是周四，避开 23 日公共假期。'],
+        ['12:00–13:15','liberty','自由桥与午餐','步行约 5–10 分钟到桥边。桥上往返拍照，午餐选市场周边或酒店附近。'],
+        ['14:00–16:00','hotel','办理入住、午睡','按酒店实际入住时间执行；这一段建议保留。'],
+        ['16:30–17:40','vigado','2 路电车与多瑙河步道','从 Boráros tér 沿佩斯河岸北上，到 Vigadó tér 一带下车；看对岸城堡和链子桥。'],
+        ['17:40–19:00','dock','夜游船，建议订 18:00 左右','选 Danube Legend 约 1 小时观光船，提前 20 分钟到 Dock 7。官网季节时刻表列有 18:00 班，实际余位未查询。'],
+        ['19:15–20:30','hotel','晚餐后回酒店','为第二天早起留出睡眠时间；若很疲劳，游船可删，不挤占休息。']
+      ]},
+    {id:'23',date:'10 月 23 日 · 周五',title:'维也纳一日游：美景宫与老城',city:'Vienna',color:'#9a4d18',walk:'步行约 6–8 km，含主火车站至美景宫',note:'跨城火车尚未查到 23 日可售班次；下列为目标时间窗口，需按所购车次前后调整。目标去程 06:30–07:30 出发、09:30–10:30 抵达；回程 19:00–20:00 出发。两地当天没有时差。',
+      route:['hbf','belvedere','karl','opera','hofburg','stephans','hbf'],
+      segments:[['hbf','belvedere','walk'],['belvedere','karl','walk'],['karl','opera','walk'],['opera','hofburg','walk'],['hofburg','stephans','walk'],['stephans','hbf','transit']],
+      nav:['belvedere','karl','opera','hofburg'],
+      events:[
+        ['05:30–06:30','kelenfold','酒店出发，按车次倒推','优先比价 Budapest-Kelenföld → Wien Hbf 直达车，也查 Budapest-Keleti。出租车到 Kelenföld 预计 20–30 分钟，至少提前 25–30 分钟到站；公共交通另留 45–60 分钟。'],
+        ['06:30–10:30','hbf','去程火车窗口','选直达 RJ / RJX / EC，优先约 3 小时以内的结果。不要把此窗口当成已确认班次。若到达晚于 10:30，将美景宫改为花园与外观。'],
+        ['10:30–12:15','belvedere','上美景宫：本日唯一大型室内景点','从 Wien Hbf 步行约 20–25 分钟。想看克里姆特《吻》，在官网订 Upper Belvedere，建议 10:30 或 11:00 时段，需先确定火车并留至少 45–60 分钟缓冲。'],
+        ['12:15–13:15','karl','花园、卡尔教堂与午餐','沿花园向北走，至 Karlsplatz 约 25–30 分钟；教堂以外观为主，午餐放附近。'],
+        ['13:15–14:00','opera','国家歌剧院与环城大道','步行约 10 分钟；看外观、沿 Albertina 周边走，不订内部导览。'],
+        ['14:00–15:15','hofburg','霍夫堡庭院、英雄广场、米夏埃尔广场','歌剧院经城堡花园步行约 15–20 分钟；以公共外部空间为主，不再叠加茜茜博物馆。'],
+        ['15:15–16:15','stephans','Graben 大街、圣斯蒂芬大教堂','经 Kohlmarkt / Graben 步行约 15–20 分钟。外观与可开放公共区域为主；不安排登塔。宗教活动时服从现场开放安排。'],
+        ['16:15–17:45','stephans','咖啡、简餐和机动时间','选老城有空位的咖啡馆即可；不用为一家热门店排长队。若下雨，可把本段延长。'],
+        ['18:00–19:30','hbf','U1 返回主火车站','Stephansplatz → Südtiroler Platz–Hauptbahnhof，出站跟火车图标到站台；给地铁、步行与找站台留 35–45 分钟，至少提前 30 分钟到火车站。'],
+        ['19:00–23:30','hotel','回程火车与酒店','目标 19:00–20:00 直达车返布达佩斯，约 22:00–23:30 回酒店；以实际车次为准，提前把回程一并买好。']
+      ]},
+    {id:'24',date:'10 月 24 日 · 周六',title:'布达城堡区，下午报到与欢迎会',city:'Budapest',color:'#6d4e8b',walk:'城堡区步行约 3–5 km；上山用车省体力',note:'24 日官方报到 14:00–19:30，欢迎会 18:00–20:00，均在 HUNGEXPO。上午游览后直接去会场，不安排午后远距离景点。',
+      route:['hotel','bastion','castle','chain','hungexpo','hotel'],
+      segments:[['hotel','bastion','transit'],['bastion','castle','walk'],['castle','chain','walk'],['chain','hungexpo','transit'],['hungexpo','hotel','transit']],
+      nav:['bastion','castle','chain'],
+      events:[
+        ['07:30–08:30','hotel','早餐、出发','打车到 Szentháromság tér 一带最省力，预计 25–40 分钟；公交需另留约 60 分钟。'],
+        ['08:30–09:15','bastion','渔人堡拍照','先看多瑙河和国会全景。公共平台与收费上层按现场标识区分；不要依赖旧攻略的早晚免票规则。'],
+        ['09:15–10:00','bastion','马加什教堂内部','想进教堂可买 Church 票；不加钟楼，避免重复登高。需检查 24 日开放日历，遇婚礼或礼拜改外观。'],
+        ['10:00–11:30','castle','城堡区街巷与王宫外部','步行约 20–25 分钟到王宫，途中留拍照时间。只逛当日开放庭院和观景点，不加入国家美术馆。'],
+        ['11:30–12:30','chain','下山、链子桥与午餐','按开放步道下山到 Clark Ádám tér，经链子桥到佩斯；不依赖缆车。午餐后结束旅游段。'],
+        ['13:30–15:30','hungexpo','前往会场、报到','公共交通路线当天查 BudapestGO；会方说明 M2 到 Örs vezér tere 后有接驳，实际班次与上车点看参会通知。转乘与接驳合计预留 60–75 分钟。'],
+        ['15:30–17:30','hungexpo','熟悉场地、与合作者碰面','找 Hall H、确认 26 日海报位置及张贴要求；展台若已开放就逛，若仍布展则约朋友喝咖啡，不把本段当官方展览开放时段。'],
+        ['18:00–20:00','hungexpo','Welcome Reception','正式预留 social 时间。官方写有小食和饮料，按你的注册类别与 badge 入场；不要把小食当作一定有完整晚餐。'],
+        ['20:00–21:15','hotel','返回酒店，必要时补晚餐','为主会第一天留出充足睡眠。']
+      ]},
+    {id:'25',date:'10 月 25 日 · 周日',title:'开幕、展台与 poster，傍晚温泉',city:'Budapest',color:'#2367a0',walk:'公园步行约 2–3 km；温泉包提前带到会场',note:'当天凌晨夏令时结束，03:00 回拨到 02:00。手机开自动时区；这天起当地比北京时间晚 7 小时，前几天晚 6 小时。本方案主动放弃 16:00–17:30 的 B 场以换取温泉时间。',
+      route:['hotel','hungexpo','heroes','vajda','bath','hotel'],
+      segments:[['hotel','hungexpo','transit'],['hungexpo','heroes','transit'],['heroes','vajda','walk'],['vajda','bath','walk'],['bath','hotel','transit']],
+      nav:['heroes','vajda','bath'],
+      events:[
+        ['07:00–08:40','hungexpo','早餐、到会场','公共交通提前约 70 分钟出发；出租车按当天路况安排。'],
+        ['09:00–10:30','hungexpo','开幕与 Pascale Fung keynote','这是官方开场和主旨报告时段。'],
+        ['10:30–11:00','hungexpo','Coffee break：集中逛展台','先去最想聊的 2–3 家，准备一句研究方向介绍；展商实际开放以现场为准。'],
+        ['11:00–12:30','hungexpo','A 场 poster / oral','挑 4–6 张相关 poster，每张给 10–15 分钟；不要试图把所有海报扫完。'],
+        ['12:30–14:00','hungexpo','午餐与作者交流','会议官网说明主会午餐提供。约上午聊得投机的人一起吃，留出后续联系方式。'],
+        ['14:00–15:30','hungexpo','展台续聊 / 同行交流 / panel','这段是你的机动选择：优先补完重点展台和约聊；若关心官方 reviewing report 或 panel，可回报告厅。'],
+        ['15:30–16:20','heroes','离场前往城市公园','优先出租车，预计 25–40 分钟并留缓冲；公共交通约 45–60 分钟，可能需要删掉一个公园点。'],
+        ['16:20–17:10','vajda','英雄广场、沃伊达奇城堡外观','广场约 15–20 分钟，步行约 10 分钟到城堡外部，再到温泉。若晚到，直接去温泉。'],
+        ['17:15–19:30','bath','塞切尼温泉','已核对通常周日 08:00–20:00、池区 19:40 清场，现场售票一般提前 1 小时结束。随身带泳衣、毛巾、拖鞋；选普通入场加储物柜，付款页确认当日票价和入场条件。'],
+        ['19:45–21:15','hotel','晚餐与返回酒店','温泉是可删项：若想完整参加 B 场，则删温泉，会议后直接晚餐。']
+      ]},
+    {id:'26',date:'10 月 26 日 · 周一',title:'你的 poster + 深度交流 + Social Event',city:'Budapest',color:'#ad3f52',walk:'全天会场；不安排跨城或需预约的景点',note:'你提供的个人固定事项：09:00–10:30 poster，按二作需要支持交流规划。官方 C 场时间吻合；没有核对论文编号、展板号或个人排期。Social Event 总览写 19:00，活动专页写 18:30 开门，本计划按 18:30 到场。',
+      route:['hotel','hungexpo','hotel'],segments:[['hotel','hungexpo','transit'],['hungexpo','hotel','transit']],nav:[],
+      events:[
+        ['07:00–08:15','hungexpo','早点出发、留出路况缓冲','建议约 07:15 从酒店出发，打车目标 08:00–08:15 到；不把接驳车的未知等候时间押在自己的 poster 前。'],
+        ['08:15–09:00','hungexpo','检查海报、与一作分工','确认展板、材料与二维码；准备 30 秒简介和 2 分钟讲解。张贴时间仍服从会议规定。'],
+        ['09:00–10:30','hungexpo','你的 poster：锁定','不安排景点、其他会场或展台约聊；和一作轮流接待但保持可联系。'],
+        ['10:30–11:00','hungexpo','Coffee break，记录反馈','先把刚才交流中提到的问题、名字和想跟进的工作记下来。'],
+        ['11:00–12:30','hungexpo','D 场 poster / oral','优先看与你们论文相关的 3–5 项工作；现场约下午继续聊。'],
+        ['12:30–14:00','hungexpo','与合作者午餐','预留完整交流，不把午休塞进往返市区交通。'],
+        ['14:00–15:00','hungexpo','展台或一对一约聊','这是个人建议安排；官方同期有 Business Meeting，可按兴趣参加。'],
+        ['15:15–16:15','hungexpo','Graham Neubig keynote','建议保留。'],
+        ['16:15–18:15','hungexpo','Coffee break 与 E 场','休息后看 poster 或补展台；将感兴趣的人约到晚间活动继续聊。'],
+        ['18:30–22:00','hungexpo','Social Event','活动专页：18:30 开门与晚餐、19:15 演出、后续音乐社交，22:00 结束。佩戴会议 badge；具体入场资格以注册条款为准。'],
+        ['22:00–23:00','hotel','返回酒店','活动结束按现场接驳或叫车指引返回，不再安排夜景任务。']
+      ]},
+    {id:'27',date:'10 月 27 日 · 周二',title:'国会与大教堂，留足返程时间',city:'Budapest',color:'#3d7445',walk:'上午步行约 3–4 km，机场段用车',note:'截图回程 CA720：27 日 19:35 布达佩斯起飞，28 日 11:40 抵达北京。建议 16:15–16:30 到机场。上午城市游览意味着放弃主会第三天上午；若有想参加的报告，可用下方备选。',
+      route:['hotel','parliament','shoes','basilica','hotel','airport'],
+      segments:[['hotel','parliament','transit'],['parliament','shoes','walk'],['shoes','basilica','walk'],['basilica','hotel','transit']],
+      nav:['parliament','shoes','basilica'],
+      events:[
+        ['07:00–08:40','hotel','早餐、退房与寄存行李','先完成退房，行李留酒店；若无法寄存则调整上午安排。到国会游客中心提前约 20–30 分钟。'],
+        ['09:00–10:00','parliament','国会大厦内部，预约优先','建议选 09:00–09:30 左右的可售英语或合适语种导览，约 45 分钟并留安检时间。没有查到 27 日余位，不能保证此时段；无票改外观和河岸。'],
+        ['10:00–10:30','shoes','多瑙河岸的鞋子','沿河步行约 10–15 分钟，安静停留。'],
+        ['10:45–12:00','basilica','圣伊什特万大教堂','步行约 15–20 分钟，内部与观景台按你兴趣选择；若国会改到较晚时段，本点只看外观。'],
+        ['12:00–13:00','basilica','午餐与少量伴手礼','在市中心解决，不再跨河加点。'],
+        ['13:00–14:00','hotel','回酒店取行李','给回酒店、取行李与确认叫车留出时间。'],
+        ['14:00–15:15','hotel','机动缓冲','休息、整理行李；遇堵车或当天交通提示可提前出发。'],
+        ['15:15–16:30','airport','前往机场 T2','建议预约出租车，目标 16:15–16:30 到，距离航班约 3 小时。若选 100E，建议约 14:45 离开酒店并按 BudapestGO 倒推。'],
+        ['19:35','airport','CA720 起飞','28 日 11:40 北京首都 T3 抵达，按截图当地时间。']
+      ]}
+  ]
+};
+</script>
+<script>// Trip supplement: all distances/times below are planning estimates, not live routing.
+trip.detailChecked = '2026-10-16';
+Object.assign(trip.places, {
+  kalvin:{name:'Kálvin tér M · 100E 下车区',local:'Kálvin tér M 100E Budapest',ll:[47.4892,19.0619]},
+  fovam:{name:'Fővám tér M · 2 路电车',local:'Fővám tér M tram 2 Budapest',ll:[47.4875,19.0558]},
+  boraros:{name:'Boráros tér H · 2 路电车',local:'Boráros tér H tram 2 Budapest',ll:[47.4801,19.0660]},
+  boraros46:{name:'Boráros tér H · 4/6 路电车',local:'Boráros tér H tram 4 6 Budapest',ll:[47.4795,19.0668]},
+  zsil:{name:'Zsil utca',local:'Zsil utca tram Budapest',ll:[47.4838,19.0619]},
+  marcius:{name:'Március 15. tér',local:'Március 15. tér tram Budapest',ll:[47.4919,19.0514]},
+  vigadostop:{name:'Vigadó tér · 电车站（景点 5）',local:'Vigadó tér tram Budapest',ll:[47.4956,19.0488]},
+  mester:{name:'Mester utca / Ferenc körút',local:'Mester utca Ferenc körút tram Budapest',ll:[47.4816,19.0695]},
+  corvin:{name:'Corvin-negyed M',local:'Corvin-negyed tram Budapest',ll:[47.4850,19.0700]},
+  harminc:{name:'Harminckettesek tere',local:'Harminckettesek tere tram Budapest',ll:[47.4892,19.0713]},
+  rakoczi:{name:'Rákóczi tér M',local:'Rákóczi tér M Budapest',ll:[47.4924,19.0717]},
+  blaha:{name:'Blaha Lujza tér M',local:'Blaha Lujza tér M Budapest',ll:[47.4971,19.0703]},
+  keleti:{name:'Budapest-Keleti · 东站',local:'Budapest-Keleti railway station',ll:[47.5003,19.0838]},
+  puskas:{name:'Puskás Ferenc Stadion M',local:'Puskás Ferenc Stadion M Budapest',ll:[47.5000,19.1066]},
+  pillango:{name:'Pillangó utca M',local:'Pillangó utca M Budapest',ll:[47.5012,19.1192]},
+  ors:{name:'Örs vezér tere M · 接驳换乘',local:'Örs vezér tere M Budapest',ll:[47.5028,19.1360]},
+  deak:{name:'Deák Ferenc tér M',local:'Deák Ferenc tér M Budapest',ll:[47.4977,19.0545]},
+  astoria:{name:'Astoria M',local:'Astoria M Budapest',ll:[47.4946,19.0604]},
+  gellert:{name:'Szent Gellért tér – Műegyetem',local:'Szent Gellért tér M Budapest',ll:[47.4837,19.0539]},
+  moricz:{name:'Móricz Zsigmond körtér M',local:'Móricz Zsigmond körtér M Budapest',ll:[47.4776,19.0478]},
+  ujbuda:{name:'Újbuda-központ M',local:'Újbuda-központ M Budapest',ll:[47.4733,19.0460]},
+  bikas:{name:'Bikás park M',local:'Bikás park M Budapest',ll:[47.4649,19.0330]},
+  eos:{name:'Eötvös tér',local:'Eötvös tér tram Budapest',ll:[47.4982,19.0472]},
+  szechenyiter:{name:'Széchenyi István tér',local:'Széchenyi István tér tram Budapest',ll:[47.5004,19.0453]},
+  kossuth:{name:'Kossuth Lajos tér M',local:'Kossuth Lajos tér tram Budapest',ll:[47.5055,19.0460]},
+  visitorstop:{name:'Országház, látogatóközpont · 电车站',local:'Országház látogatóközpont tram Budapest',ll:[47.5094,19.0468]},
+  bathmetro:{name:'Széchenyi fürdő M1',local:'Széchenyi fürdő metro Budapest',ll:[47.5175,19.0808]},
+  oktogon:{name:'Oktogon M',local:'Oktogon M Budapest',ll:[47.5051,19.0632]},
+  stephansmetro:{name:'Stephansplatz U1',local:'Stephansplatz U1 Wien',ll:[48.2080,16.3728]},
+  karlsmetro:{name:'Karlsplatz U1',local:'Karlsplatz U1 Wien',ll:[48.2008,16.3699]},
+  taub:{name:'Taubstummengasse U1',local:'Taubstummengasse U1 Wien',ll:[48.1936,16.3706]},
+  hbfmetro:{name:'Südtiroler Platz–Hauptbahnhof U1',local:'Südtiroler Platz Hauptbahnhof U1 Wien',ll:[48.1858,16.3740]}
+});
+// Dock 7 is by Vigadó tér. Approximate shore-side marker; follow the vendor's sign and ticket.
+trip.places.dock.ll=[47.4950,19.0492];
+const detailSources = {
+ bkk:['BKK 机场巴士：票价、上车与验证','https://bkk.hu/en/travel-information/airport-express/'],
+ network:['BKK 线路与方向入口','https://bkk.hu/menetrendek'],
+ fares:['BKK 票价表','https://bkk.hu/jegyek-es-berletek/arak/'],
+ cruise:['Legenda 官方票价','https://legenda.hu/en/prices'],
+ faq:['Legenda：现场购票与找码头','https://legenda.hu/en/faq'],
+ payment:['Legenda：在线购票和 Visa / Mastercard 支付','https://legenda.hu/en/privacy-policy'],
+ conference:['EMNLP 官方日程','https://2026.emnlp.org/program/'],
+ shuttle:['EMNLP 接驳说明','https://2026.emnlp.org/program/welcome_reception/'],
+ social:['26 日 Social Event','https://2026.emnlp.org/program/events/'],
+ mav:['MÁV 奥地利票种','https://www.mavcsoport.hu/mav-szemelyszallitas/nemzetkozi-utazas/ausztria']
+};
+const walkSeg=(label,points,steps)=>({mode:'walk',label,points,steps});
+const tramSeg=(label,points,steps)=>({mode:'tram',label,points,steps});
+const metroSeg=(label,points,steps)=>({mode:'metro',label,points,steps});
+const taxiSeg=(label,points,steps)=>({mode:'taxi',label,points,steps});
+const tramNorth=['boraros','zsil','fovam','marcius','vigadostop','eos','szechenyiter','kossuth','visitorstop'];
+const ringNorth=['boraros46','mester','corvin','harminc','rakoczi','blaha'];
+const m2East=['blaha','keleti','puskas','pillango','ors'];
+const m4West=['fovam','gellert','moricz','ujbuda','bikas','kelenfold'];
+const hotelWalkOut=walkSeg('酒店 → Boráros tér H 的 2 路站台',['hotel','boraros'],[
+ '从酒店正门到 Soroksári út 人行道，朝 Boráros tér / Petőfi híd（桥头广场）走，约 200–350 米、3–5 分钟。过街只走有信号灯的斑马线。',
+ '找站牌上的“2”和“Boráros tér H”。这里还有上桥的 4/6 路、公交和 H7；本段要找沿佩斯河岸走的 2 路。H 表示可换郊区铁路，不是让你乘 H7。'
+]);
+const hotelWalkBack=walkSeg('Boráros tér H → 酒店',['boraros','hotel'],[
+ '下车后沿人行道往 Soroksári út 12、ibis Styles Budapest City 走，约 200–350 米、3–5 分钟；不要走上 Petőfi híd。',
+ '地图“步行导航”目的地用完整酒店名称和 Soroksári út 12，避免去到 ibis Budapest City 或 ibis Styles Budapest Center。'
+]);
+const fareSingle='若没有日票/通票：本段电车每人 1 张 500 HUF 单程票，上车后立即在车内验证器打票；换一辆电车或进入地铁须另有票。买纸票选英语 Single ticket。';
+const cityTicket={title:'今天的公交票：建议 24 小时票 + 单独的机场票',body:[
+ '机场 100E 每位成人 2,500 HUF，和市区票分开。今天多次乘 2 路，省心选 Budapest 24-hour travelcard，当前 2,750 HUF；连同机场票共 5,250 HUF/人。少坐车可改每程 500 HUF 单程票。',
+ '最容易执行：机场 BKK 售票机切 English，用 Visa/Mastercard 购买纸质 24-hour travelcard，设 22 日开始时间；印好起效时刻的日票不用每次打孔，检查时出示原票。100E 不包含在这张日票里。',
+ '也可以在 BudapestGO 买票：手机单程票按 App 提示上车前扫码；日票有开始时间，不要把“购买成功”当成已经开始有效。为避免刚落地网络和扫码不熟，今天优先纸质日票。',
+ '100E 上的 Pay&GO 刷银行卡是机场票购票方式；不要假设 2 路电车也能同样“银行卡一碰就乘车”。两个人各有有效票，不共用一张日票。'
+],links:[detailSources.bkk,detailSources.fares]};
+const commonTaxi=[
+ '前一晚请酒店前台预约正规出租车，或在 Bolt / Főtaxi 正规 App 设置上车点为酒店正门、输入本卡的完整目的地。看清车牌再上车；本手册没有代你叫车。',
+ 'App 内选银行卡支付，或上车前问“Can I pay by card?”确认车内刷卡；不用向司机报银行卡号。路线、费率和预估价以 App/计价器为准，本文不编固定包车价。'
+];
+const toVenue=()=>({id:'hotel-venue',title:'酒店 → HUNGEXPO：4/6 路 + M2 + 会议接驳',distance:'全程约 11–13 km；步行合计约 0.6–1 km',duration:'门到会场留 60–75 分钟',fare:'有效市区通票可用前两段；单程票需电车 1 张 + 地铁 1 张，共 1,000 HUF/人。接驳以会议通知为准。',segments:[
+ walkSeg('酒店 → 4/6 路站台',['hotel','boraros46'],['正门出来到 Boráros tér H，约 200–350 米、3–5 分钟。这次找“4 / 6”站牌，不是河岸 2 路。']),
+ tramSeg('4 或 6 路：Széll Kálmán tér M 方向',['boraros46','mester','corvin','harminc','rakoczi','blaha'],['在 Boráros tér H 上 4 或 6 路，车头看 Széll Kálmán tér M。不要上往 Újbuda-központ / Móricz Zsigmond körtér 的车。','依次 Mester utca / Ferenc körút → Corvin-negyed → Harminckettesek tere → Rákóczi tér → Blaha Lujza tér M；约 5 站、10–15 分钟。']),
+ metroSeg('M2：Örs vezér tere 方向',m2East,['Blaha 下电车后跟红色 M2 标志入地铁，换乘步行约 3–6 分钟；单程纸票在进入地铁付费区前再验一张。','坐 Örs vezér tere 方向，经过 Keleti pályaudvar → Puskás Ferenc Stadion → Pillangó utca → 终点 Örs vezér tere；约 10–15 分钟。']),
+ {mode:'bus',label:'Örs vezér tere → EMNLP 接驳 → HUNGEXPO',points:['ors','hungexpo'],steps:['到站出付费区后寻找 EMNLP / HUNGEXPO 接驳标识或工作人员。会议确认有免费接驳，但具体出口编号、发车时刻、候车位置尚未核实，出发前看参会邮件。','连同等车和最后步行留 15–25 分钟。若现场找不到接驳，先问工作人员；备选是在正规 App 从 Örs 叫车到 HUNGEXPO Albertirsai út 10。不要直接按直线穿过铁路、停车场或展馆围栏。']}
+],sources:[detailSources.network,detailSources.shuttle]});
+const venueTaxi=(id,title,from,to,distance,duration)=>({id,title,distance,duration,fare:'出租车以 App 预估与计价器为准；支持方式上车前确认。',segments:[taxiSeg(title,[from,to],[...commonTaxi,'给司机/输入目的地：'+trip.places[to].local+'。HUNGEXPO 的具体入场门以会议邮件为准，地图标的是会址，不保证正好是当日入口。'])],sources:[detailSources.shuttle]});
+const D={};
+D['22']={
+ notes:[
+  ['落地先做这三件事','连上手机数据或机场 Wi-Fi；把酒店全名和地址截屏；护照、手机、银行卡放随身小包。入境取行李预计 60–120 分钟，顺利或排队都会影响以下钟点。'],
+  ['今天带行李的走法','推荐 100E → Kálvin tér → 步行到 Fővám tér → 2 路 → 酒店，不再在两种换乘方案之间犹豫。总共约 75–100 分钟（不含入境）；若夜航后很累，机场外 Főtaxi 柜台直达酒店也是明确备选。'],
+  ['当天携带','护照、可境外支付的 Visa/Mastercard、充电宝、外套。船上河风较凉，带一层防风衣；船票确认邮件和酒店地址离线保存。'],
+  ['入住与车票','酒店 22–27 日订单仍需核对。上午先寄存，14:00 是否能进房以酒店安排为准。保留纸票到下车/出站，不把 100E 机场票拿去坐电车。']
+ ],
+ tickets:[cityTicket,{title:'6 · 夜游船：建议官网提前买，现场也能买',body:[
+  '买什么：Legenda 的 Danube Legend / Evening sightseeing cruise，约 1 小时，成人 €25/人；两位成人合计 €50。有效学生证适用票官网列 €22.50，是否选学生票按自己的资格，不因参加会议自动享受折扣。',
+  '操作顺序：打开下面官方 Ticket purchase → 选 Danube Legend → 日期 2026-10-22 → 18:00 左右实际可选班次 → 成人张数 → 姓名、邮箱 → 核对订单 → Confirmation and payment by credit card。这里只是建议时段，未查到当日余位。',
+  '怎么付：官网列支持 Visa / Mastercard，跳转 K&H 支付页后按页面输入卡信息、完成发卡行验证，再点 Back to the shop 返回；票务确认发送到你填写的邮箱。提前确认卡已开通境外网购，能够接收银行验证。不要把仅有预订信息的邮件当成支付成功：要看到付款成功与票务确认。',
+  '现场买吗：可以到 Legenda 的售票亭购买，但官网明确建议提前预订，18:00 可能售罄。若你想落地看体力再决定，上午先在官网查余位或到售票亭询问；当天最迟 17:20 左右到码头留购票时间。现场收哪些现金币种、银行卡及银联/支付宝/微信，本轮未确认；不靠这些未确认方式兜底，优先官网 Visa/Mastercard。',
+  '登船：17:40 左右到 Dock 7，找“Legenda”招牌，把电子票/Reservation ID 给工作人员核验，按船票指示排队；码头号会有多家公司，不是看到游船就上。票面上船处优先。'
+ ],links:[['官网直接购票','https://legenda.hu/en/ticket-purchase'],detailSources.cruise,detailSources.payment,detailSources.faq]}],
+ legs:[
+ {id:'airport-hotel',title:'落地 → 酒店：100E + 走路 + 2 路',distance:'100E 约 20–23 km；步行换乘约 600 m；电车 2 站',duration:'取完行李后约 75–100 分钟；带箱子按较长值',fare:'100E 2,500 HUF + 电车单程 500 HUF = 3,000 HUF/人；已有有效日票则电车不另付。',segments:[
+  {mode:'bus',label:'100E：机场 T2 → Kálvin tér M',points:['airport','kalvin'],steps:[
+   '从取行李后的 Arrivals 出口进入公共到达区，跟“Bus / 100E / City centre”标志到 T2 航站楼外公交候车区。具体门号未核实，以当天标识为准；认准 100E，不上 200E。',
+   '车头目的地方向应是 Deák Ferenc tér（市中心）。机场上车，Kálvin tér M 下车；它是进城段最先到的市区停靠点，不必坐到终点。车上看电子屏和报站，拿不准就把“Kálvin tér”给工作人员看。',
+   '购票最直接：上车按工作人员指引在 100E 的 Pay&GO 终端刷感应银行卡/手机钱包，每位成人购买一张 2,500 HUF 机场票，等屏幕显示成功。支付和验证一次完成，检查时用同一张卡或同一设备。多位旅客按设备/工作人员提示逐人买票，不默认一次刷卡覆盖两人。',
+   '若已用 BudapestGO 买机场票，上车前扫码激活并向工作人员展示；若用纸票，由登车人员处理验证。大箱子放行李区并照看。车程估计 35–50 分钟，另留排队和等车。'
+  ]},
+  walkSeg('Kálvin tér → Fővám tér 的 2 路站台',['kalvin','market','fovam'],[
+   'Kálvin tér 下车后先在人行道上站稳，打开本段步行导航。找 Vámház körút，沿这条路往中央大市场 / 多瑙河 / Szabadság híd（自由桥）方向走；不要往 Múzeum körút / Astoria 的方向走。',
+   '约 550–650 米、8–12 分钟可到 Fővám tér 一带，会看到大市场建筑和绿色自由桥。跟“2”电车标志到河岸线站台；不是桥面上 47/49 路的站台，也不是往深处走的 M4 地铁。站台及无障碍绕行按现场标识，带箱子多留 5 分钟。'
+  ]),
+  tramSeg('2 路：Közvágóhíd H 方向，2 站到 Boráros tér H',['fovam','zsil','boraros'],[
+   '站牌找 2，车头看 Közvágóhíd H（向南）。机场刚到先只认 2 路，不为等车省几分钟临时尝试 2B 或 23。',
+   'Fővám tér M 上车 → Zsil utca → Boráros tér H 下车，共 2 站，车上约 4–6 分钟。若电子屏下一站是 Március 15. tér，就坐反了：下一站下车，安全过街改坐反向，不在轨道中间穿行。',
+   '使用有效 24 小时票直接保留备查；若买单程纸票，上车立即在车内验证器打票，不能把 100E 票当作电车票。'
+  ]),hotelWalkBack],sources:[detailSources.bkk,detailSources.network]},
+ {id:'hotel-market',title:'酒店 → 中央大市场：约 1.3 km，2 路坐 2 站',distance:'步行全程约 1.2–1.5 km；乘车时两头步行合计约 0.4–0.6 km',duration:'推荐乘车门到门约 15–25 分钟；纯步行约 18–25 分钟',fare:fareSingle,segments:[hotelWalkOut,
+  tramSeg('2 路：Jászai Mari tér 方向，Boráros → Fővám',['boraros','zsil','fovam'],['车头看 Jászai Mari tér（向北、往市中心）；不是 Közvágóhíd H。','上车后 Zsil utca → Fővám tér M，2 站、约 4–6 分钟，在 Fővám tér 下车。']),
+  walkSeg('Fővám tér 站台 → 市场正门',['fovam','market'],['离开站台，按人行通道到广场，走向红砖、彩色屋顶的大市场建筑（Vámház körút 1–3）；约 200–300 米、3–5 分钟。不要上自由桥过河。','想直接走：从酒店沿 Soroksári út → Boráros tér → Közraktár utca / Bálna 河岸一带向北走到市场；约 1.2–1.5 km，按导航选开放人行道。'])],sources:[detailSources.network]},
+ {id:'market-bridge',title:'中央大市场 → 自由桥：走到佩斯桥头',distance:'市场到东桥头约 250–400 m；走到桥中再回来额外约 400–600 m',duration:'到桥头约 4–6 分钟，拍照另留 20–30 分钟',fare:'步行免费。',segments:[walkSeg('市场 → Fővám tér → 自由桥',['market','liberty'],['从市场门口到 Fővám tér 广场，向绿色自由桥走，走人行道和斑马线。','今天酒店在佩斯侧（市场这一侧）。拍照可到桥中折返；如果过到布达侧，回酒店前先沿桥走回市场这一侧，不能直接从布达桥头等河岸 2 路。'])]},
+ {id:'bridge-hotel',title:'自由桥附近 → 酒店办理入住',distance:'佩斯桥头至酒店步行约 1.3–1.6 km；电车仍为 2 站',duration:'推荐电车门到门 15–25 分钟；纯步行约 20–25 分钟',fare:fareSingle,segments:[
+  walkSeg('回到佩斯侧 Fővám tér 的 2 路站台',['liberty','fovam'],['站在市场这一侧的桥头，跟河岸“2”电车标志回 Fővám tér M 站台，约 100–250 米、3–5 分钟。若人在桥另一端，先加 5–10 分钟步行过桥。']),
+  tramSeg('2 路：Közvágóhíd H 方向',['fovam','zsil','boraros'],['Fővám tér M → Zsil utca → Boráros tér H，2 站、约 4–6 分钟。认车头 Közvágóhíd H；Jászai Mari tér 是反方向。']),hotelWalkBack],sources:[detailSources.network]},
+ {id:'hotel-vigado',title:'酒店 → 5 · Vigadó tér：2 路坐 4 站',distance:'沿河电车段约 2.3–2.7 km；两头步行约 300–500 m',duration:'门到门约 20–30 分钟，车上约 8–12 分钟',fare:fareSingle,segments:[hotelWalkOut,
+  tramSeg('2 路：Jászai Mari tér 方向，4 站',['boraros','zsil','fovam','marcius','vigadostop'],['Boráros tér H 上车，车头认 Jászai Mari tér。','依次 Zsil utca → Fővám tér M → Március 15. tér → Vigadó tér。第 4 站 Vigadó tér 下车；不是在 Március 15. tér 提前下。','想看河景可选临河一侧有空的位置，沿途以看报站为先，别只顾拍照。']),
+  walkSeg('电车站 → 5 · Vigadó 广场 / 河岸',['vigadostop','vigado'],['下车沿人行通道进 Vigadó tér 广场一带，约 100–200 米、2–4 分钟；先认电车轨道、道路和临水低处的码头，别直接横穿车流。'])],sources:[detailSources.network,['Vigadó 场馆的官方交通说明','https://vigado.hu/hu/megkozelithetoseg']]},
+ {id:'vigado-dock',title:'5 → 6 · Legenda Dock 7：从广场到码头',distance:'约 150–300 m，按你在广场的位置变化',duration:'走路约 5–8 分钟；17:40 前到',fare:'步行免费，船票另买。',segments:[walkSeg('Vigadó tér → Legenda 7 号码头',['vigado','vigadostop','dock'],['按 Legenda 官方找路说明：从 Vigadó 广场下台阶到河岸道路，走红绿灯人行横道；过街后左转，继续约 50 米，找 Legenda 招牌。','如果台阶不方便，点步行导航找当时可用的平缓通道，多留时间。下层河岸有车行道，不能只盯着“船在对岸”直穿。','出示确认邮件/电子票，在 Dock 7 按工作人员指引登船；看准 Legenda，不把相邻公司的票亭或船当成同一家公司。'])],sources:[detailSources.faq]},
+ {id:'dock-hotel',title:'游船结束 → 酒店：原路坐 2 路返回',distance:'码头到电车站约 150–300 m；车上约 2.3–2.7 km',duration:'约 20–30 分钟，不含晚餐',fare:fareSingle,segments:[walkSeg('Dock 7 → Vigadó tér 电车站',['dock','vigadostop'],['上岸后通过有信号灯的人行横道回 Vigadó tér 的 2 路站台；不要沿机动车下层河岸一直追着地图走。']),tramSeg('2 路：Közvágóhíd H 方向，4 站',['vigadostop','marcius','fovam','zsil','boraros'],['Vigadó tér → Március 15. tér → Fővám tér M → Zsil utca → Boráros tér H，下车后走回酒店。']),hotelWalkBack],sources:[detailSources.network]}
+ ]};
+D['23']={notes:[
+ ['出发前一晚','先买往返火车、确认是 Kelenföld 还是 Keleti。请前台安排叫早和出租车；问能否打包早餐，不假设清晨自助早餐已开。'],
+ ['今天随身带','护照、两程电子票、支付卡、充电宝、防风外套；轻装去维也纳，大行李留酒店。两地当天时区相同。'],
+ ['假日与班次','23 日是匈牙利公共假期，市区交通可能按假日图。本文没有确认当日精确列车、工程替代或末班时刻；以铁路结果页及前一晚运行信息为准。'],
+ ['把返程作为硬截止','目标回程车前至少 30 分钟进 Wien Hbf；下午咖啡可缩短，不能压缩返程到站缓冲。上美景宫票要等火车确定后再买，馆票时段距到站至少 45–60 分钟。']
+],tickets:[{title:'火车票：往返一起买，特别核对车站名',body:[
+ 'MÁV 或 ÖBB 切英文，日期 2026-10-23；去程先搜 Budapest-Kelenföld → Wien Hbf，06:00 后出发，挑你接受的直达结果。回程同日 Wien Hbf → 同一布达佩斯车站，搜索 18:30 后。目标去程约 06:30–07:30、回程约 19:00–20:00，不是已确认时刻。',
+ '选择真实人数、No discount（无适用折扣时）、二等座，建议加座位；确认购入的是车票而非 Seat reservation only。按护照拼写填姓名，在官方结账页用其显示的银行卡方式付款，完成银行验证，下载两程票。',
+ 'START Europa 官方产品单程 €13 起、限量且绑定车次，普通档不可退。这是公开起价，不是 23 日报价；两程价格、座位费、改退和最终付款币种看结果页。',
+ '票面 Budapest-Kelenföld 就到 Kelenföld；票面 Budapest-Keleti 就到东站。本页地图分别给了这两条酒店出发路线，不默认二者可互换登车。'
+],links:[['MÁV 购票','https://jegy.mav.hu/'],['ÖBB 购票','https://shop.oebbtickets.at/en/ticket'],detailSources.mav]},
+{title:'上美景宫与维也纳市内票',body:[
+ '看《吻》选 Upper Belvedere。官网当前成人日价 €23；选 10/23、与你火车相容的入场时段，按官方结账显示的支付方式完成付款并保存电子票。若火车晚到，删馆内参观，不再硬赶。',
+ '本日多数景点走路，回程 U1 可在 WienMobil / 地铁售票机买需要的单程票；不要选机场票或儿童票。单程实时价本轮未核对；想省心或下雨需多乘车，可选 24 小时数字票 €9.70 / 纸票 €10.20（公开价，付款前确认）。',
+ '地铁纸票若尚未标有效开始时间，在进入地铁前按机器要求验证；数字票开始时间要覆盖当前。布达佩斯日票不能用于维也纳地铁，也不能用于跨境火车。'
+],links:[['上美景宫官网','https://www.belvedere.at/en/visit/upper-belvedere'],['维也纳市区时段票','https://www.wienerlinien.at/zeitkarten']]}],legs:[
+{id:'hotel-kelenfold',title:'酒店 → Kelenföld 火车站：清晨推荐预约出租车',distance:'道路行程估计约 6–7 km；不是直线距离',duration:'开车预留 20–30 分钟，另加到站找月台 30 分钟',fare:'按 App/计价器；若火车 07:00 开，建议约 06:00 从酒店正门出发。',segments:[taxiSeg('酒店正门 → Kelenföld 的 Etele tér 侧',['hotel','kelenfold'],[...commonTaxi,'给前台或司机看：“Budapest-Kelenföld vasútállomás, Etele tér. My train goes to Vienna.”不要只说“Budapest station”。','抵达后跟“Vasút / Train / MÁV”标志进铁路通道，不是在绿色 M4 地铁月台等国际火车。看大屏的列车号、Wien / Bécs、发车时间、vágány（股道）；不凭目的地 Wien 一个词就上车。','月台号没有预先核实，以当天大屏为准。出示电子票、核对车厢号和座号；有疑问把票给铁路工作人员看。'])],sources:[detailSources.mav]},
+{id:'hotel-kelenfold-public',title:'酒店 → Kelenföld：不打车的完整方案',distance:'2 路 2 站 + M4 5 站；步行合计约 0.5–0.9 km',duration:'早晨门到铁路月台预留 50–65 分钟，再保留 30 分钟候车',fare:'有效布达佩斯通票可覆盖；若用单程票，电车与地铁各一张，共 1,000 HUF/人。',segments:[hotelWalkOut,
+ tramSeg('2 路：Jászai Mari tér 方向',['boraros','zsil','fovam'],['Boráros tér H 上 2 路，车头 Jászai Mari tér；Zsil utca 后到 Fővám tér M，2 站下车。','这天是公共假日、清晨车次较疏，前一晚在 BudapestGO 输入实际火车发车日和出门时间查第一班。若无法留足缓冲，就用上面的出租车方案。']),
+ metroSeg('换 M4：Kelenföld vasútállomás 方向',m4West,['Fővám tér 下电车后跟绿色 M4 标志入站，换乘和验证留 5–10 分钟；这是下到地铁，不是再去 47/49 路。','车头 Kelenföld vasútállomás；依次 Szent Gellért tér – Műegyetem → Móricz Zsigmond körtér → Újbuda-központ → Bikás park → Kelenföld vasútállomás，共 5 站，约 10–12 分钟。','终点下车后跟 Train / Vasút / MÁV 指示到铁路站厅或地下通道，按票面列车号查大屏股道。地铁到站不等于已经到国际列车月台，另留 10–15 分钟走路、找股道。'])],sources:[detailSources.network]},
+{id:'hotel-keleti',title:'仅当票面写 Keleti：酒店 → 东站',distance:'打车道路估计约 4–5 km；公共交通 4/6 路 + M4',duration:'出租车约 15–25 分钟；公交留 40–55 分钟，另加 30 分钟候车',fare:'公交单程票需两张，共 1,000 HUF/人；通票内无需另买。',segments:[walkSeg('酒店 → Boráros tér 的 4/6 路',['hotel','boraros46'],['按 4/6 路站牌上车，车头 Széll Kálmán tér M。']),tramSeg('4/6 路：4 站到 Rákóczi tér',['boraros46','mester','corvin','harminc','rakoczi'],['Mester utca → Corvin-negyed → Harminckettesek tere → Rákóczi tér M，4 站下车。']),metroSeg('M4：Keleti pályaudvar 方向',['rakoczi','keleti'],['Rákóczi tér 转绿色 M4，车头认 Keleti pályaudvar；经过 II. János Pál pápa tér，第二站终点 Keleti 下车。','跟铁路站厅 / Train 标志走，按国际车票车次找月台。若预约出租车，目的地设 Budapest-Keleti railway station，不设 Kelenföld。'])],sources:[detailSources.network]},
+{id:'hbf-belvedere',title:'Wien Hbf → 上美景宫：到站后步行',distance:'按站厅出口估计约 1.0–1.3 km',duration:'约 18–25 分钟；馆票缓冲另留',fare:'步行免费；馆内另需票。',segments:[walkSeg('主火车站 → Prinz-Eugen-Straße → 上宫',['hbf','belvedere'],['离开列车后跟站厅/出口标志到地面，目的地在站的北侧；按步行导航往 Prinz-Eugen-Straße、Oberes Belvedere 走。不要跟“U1”直接进地铁。','过 Gürtel 一带使用人行横道，沿 Prinz-Eugen-Straße 方向到上宫游客入口。具体站厅出口号与馆门未核实，按导航和票面入口，不编一个出口号。','别把 Unteres Belvedere（下宫）当成 Upper Belvedere；到门口先确认票种与预约时段。'])]},
+{id:'belvedere-karl',title:'上美景宫 → 卡尔教堂与午餐',distance:'经花园、下宫外部和 Schwarzenbergplatz 约 1.4–1.8 km',duration:'走路约 25–35 分钟；拍照、午餐另计',fare:'只走开放公共区域；不进入额外收费展馆。',segments:[walkSeg('上宫 → 花园北侧 → Karlsplatz',['belvedere','karl'],['看完上宫后沿主花园向下宫 / Rennweg 方向走，在开放出口离开；随后经 Schwarzenbergplatz 往 Karlsplatz。','本段有步行导航按钮。园门如临时关闭，沿外侧公开街道绕行，不穿未开放展区；带着午餐时间约 1 小时执行。'])]},
+{id:'karl-opera',title:'卡尔教堂 → 国家歌剧院外观',distance:'约 600–800 m',duration:'步行约 10–15 分钟',fare:'外观免费，不订内部导览。',segments:[walkSeg('Karlsplatz → Opernring',['karl','opera'],['从 Karlsplatz 往歌剧院方向走，目的地 Wiener Staatsoper / Opernring，过大路用人行横道；不需要坐地铁。'])]},
+{id:'opera-hofburg',title:'歌剧院 → 霍夫堡外部与米夏埃尔广场',distance:'经城堡花园/英雄广场约 1.0–1.3 km',duration:'步行约 20 分钟，参观拍照另留',fare:'按当天开放公共空间走，博物馆不含。',segments:[walkSeg('歌剧院 → Burggarten / Heldenplatz → Michaelerplatz',['opera','hofburg'],['从歌剧院向 Burggarten / Heldenplatz 方向走，再穿可开放的霍夫堡公共通道至 Michaelerplatz。公共通道关闭时按步行导航走外侧街道。','不要临时加上茜茜博物馆排队，以免挤掉老城和返程缓冲。'])]},
+{id:'hofburg-stephans',title:'霍夫堡 → Graben → 圣斯蒂芬大教堂',distance:'约 700–900 m',duration:'纯步行约 12–18 分钟，逛街另计',fare:'外观及开放公共区域为主；登塔、地下墓室另购票。',segments:[walkSeg('Michaelerplatz → Kohlmarkt → Graben → Stephansplatz',['hofburg','stephans'],['从 Michaelerplatz 进入 Kohlmarkt 步行街，接 Graben，再到 Stephansplatz。教堂尖塔是方向参考。','礼拜时游客区域可能收缩，听现场工作人员指引；本行程不要求登塔。'])]},
+{id:'stephans-hbf',title:'老城 → Wien Hbf：U1 坐 3 站',distance:'地铁约 2.5–3 km，站内步行另计',duration:'门到火车月台留 35–45 分钟，并在发车前 30 分钟到站',fare:'维也纳市区单程票或有效时段票；不是跨境火车票。',segments:[
+ walkSeg('教堂广场 → Stephansplatz U1',['stephans','stephansmetro'],['先结束咖啡和购物，找到蓝色 U 标志、Stephansplatz 入口，跟 U1 指示走；不要误乘 U3。']),
+ metroSeg('U1：Oberlaa 方向，3 站',['stephansmetro','karlsmetro','taub','hbfmetro'],['车头看 Oberlaa；Leopoldau 是相反方向。依次 Karlsplatz → Taubstummengasse → Südtiroler Platz–Hauptbahnhof，第三站下。','地铁一般没有强制闸机拦你，仍必须在入站前有有效票。没预印有效时间的纸票按机器要求验证；别把能走进去理解为免费。']),
+ walkSeg('U1 下车 → 主火车站站厅 → 票面股道',['hbfmetro','hbf'],['跟“ÖBB / Hauptbahnhof / Trains”标志步行到铁路站厅，约 5–10 分钟，再按列车号与 Budapest 看电子屏；Gleis 是股道。','若你回程车 19:40 开，建议 18:25–18:35 从教堂一带离开，约 19:00–19:10 到铁路站厅；这是倒推示例，不是已确认 19:40 有车。'])]},
+{id:'return-station-hotel',title:'深夜回布达佩斯 → 酒店',distance:'从 Kelenföld 约 6–7 km；从 Keleti 约 4–5 km（道路估计）',duration:'出租车一般预留 20–35 分钟',fare:'夜间以 App / 正规计价器显示为准。',segments:[taxiSeg('从实际到达站叫车回酒店',['kelenfold','hotel'],['地图默认示意 Kelenföld；你如买的是 Keleti 到达，改用该站当上车点。不要为了套本图先换另一座火车站。','出站后到 App 指定的可上车位置核对车牌，终点输入 ibis Styles Budapest City, Soroksári út 12。清楚告诉司机是 City，不是 Center。','这时推荐直接回酒店。若坚持公交，先查抵达当晚 BudapestGO；不假设日间 2 路/M4 一定赶得上。'])]}
+]};
+D['24']={notes:[['出门前','带会议注册确认、证件和手机；不用拖大行李去城堡区。上午结束后直接去会场。'],['教堂和场地','马加什教堂可能因婚礼/礼拜调整开放；先查当天日历。王宫外部有施工/封闭时沿开放公共路线走，不依赖缆车。'],['报到与晚餐','官方 14:00 开始报到、18:00–20:00 欢迎会。欢迎会写的是小食和饮料，不保证能当完整晚餐；带件晚间外套。'],['接驳的不确定部分','M2 到 Örs 后的会议接驳有官方说明，出口编号、班距和最后一班未核实。提前把参会邮件中的图保存，不把未核实班次写成保证。']],tickets:[{title:'今天的门票和公交票',body:['渔人堡先看公共平台，收费上层按现场价格决定；现场官方票亭或 Budavár 票站，别把餐厅订位当景点票。','马加什教堂 Church 成人公开价 3,400 HUF；官网选教堂而不是 Tower，按显示方式银行卡付款并保存票。先确认 24 日开放日历；不可退，钟楼是另一个有时段的票种。','如果 24–26 日大部分坐公共交通，24 日首次用车开始买 72-hour Budapest-travelcard，公开价 5,750 HUF；开始时间要覆盖本次乘车，27 日过期后另买。它不包含 100E 或跨境火车。','报到、欢迎会资格按你的会议注册类别；带 badge。展台下午是否已开放以现场为准，若还在布展就改为合作者见面。'],links:[['马加什教堂官方购票','https://matyas-templom.hu/en/buy-tickets/'],['Budavár 官方票站','https://ticket.budavar.hu/en'],detailSources.conference]}],legs:[
+venueTaxi('hotel-bastion','酒店 → 城堡区：建议打车上山','hotel','bastion','道路约 6–7 km','预留 25–40 分钟；07:45–08:00 出发'),
+{id:'bastion-castle',title:'渔人堡 / 教堂 → 布达王宫外部',distance:'约 1.0–1.3 km',duration:'步行 18–25 分钟，拍照另计',fare:'公共街巷免费。',segments:[walkSeg('Szentháromság tér → Tárnok utca → Dísz tér → 王宫',['bastion','castle'],['教堂与渔人堡就在同一片广场周围，步行约 1–3 分钟。结束后沿 Tárnok utca 向 Dísz tér，再向 Szent György tér / Budavári Palota 的开放入口走。','施工围挡会改变可通行路径，本段标的是景点顺序，不保证穿过所有庭院。用步行导航和现场开放标识完成最后一段。'])]},
+{id:'castle-chain',title:'王宫 → 链子桥 → 佩斯侧午餐',distance:'下山加过桥约 1.2–1.6 km',duration:'约 25–35 分钟，需上下坡/台阶',fare:'步行免费，缆车不是必须。',segments:[walkSeg('王宫开放步道 → Clark Ádám tér → 链子桥',['castle','chain'],['往 Clark Ádám tér 下山时选开放人行通道，台阶湿滑就放慢；不翻施工围挡。下到桥头再沿桥人行道过到佩斯侧。','本路线需要下坡，若膝盖不舒服或下雨，直接用正规 App 从可上车的公开街道去午餐点/会场，不强走。'])]},
+{id:'chain-venue',title:'链子桥佩斯侧 → 会场：步行 + M2 + 接驳',distance:'先走约 700–900 m 到 Deák；随后 M2 6 站',duration:'共预留 60–75 分钟',fare:'有效市区通票；否则地铁单程 500 HUF，接驳按会方说明。',segments:[walkSeg('佩斯侧桥头 → Deák Ferenc tér M',['chain','deak'],['过桥到佩斯侧后，沿 József Attila utca 方向去 Deák Ferenc tér，约 10–15 分钟，找红色 M2。地图点的链子桥是桥身位置，先完整过到东岸再导航。']),metroSeg('M2：Örs vezér tere 方向',['deak','astoria','blaha','keleti','puskas','pillango','ors'],['Deák 上车往 Örs vezér tere；依次 Astoria、Blaha、Keleti、Puskás、Pillangó、Örs，6 站到终点。']),toVenue().segments[3]],sources:[detailSources.network,detailSources.shuttle]},
+venueTaxi('venue-hotel','欢迎会结束 → 酒店：直接叫车','hungexpo','hotel','道路约 8–11 km','预留 25–45 分钟')
+]};
+D['25']={notes:[['闹钟与时区','凌晨 03:00 回拨到 02:00，手机开自动时区。今天开始当地比北京时间晚 7 小时，按当地 09:00 到会。'],['带温泉包去会场','泳衣、拖鞋、毛巾、可装湿衣的袋子、充电宝；不要下午再绕回酒店拿。泳池区约 19:40 清场，计划 19:30 就去换衣。'],['今天的取舍','15:30 离场去温泉意味着放弃 16:00–17:30 的 B 场。若交流很有收获，删温泉，留会场；不把自己的 26 日 poster 搬开补玩。'],['迟到的删减顺序','若到公园已晚于 16:40，先删城堡外观、再删英雄广场拍照，直接到温泉。找入口、验票、更衣都要时间。']],tickets:[{title:'塞切尼温泉：买哪种票、带什么',body:['官网 Entry tickets 选 10/25、含 locker 的普通入场产品；如果官方在线只显示 Fast Track，先确认它是更贵的快速入场产品，不把它当普通票价。结账按官方显示方式用银行卡付款，保存二维码。','普通含柜日票公开价：周末 14,800 HUF，假日/旺季 15,800 HUF；25 日适用价以结账页为准。现场购买也是备选，官网说明现售入口在马戏团对面且只收银行卡，具体入口按所购票面，勿只按建筑中心定位。','自带泳衣、毛巾、拖鞋；当前官网不提供租赁。想进入正规游泳池还需泳帽，若只泡温泉池则按池区规则。把更衣、吹干头发算进时间，不到 19:40 才离水。'],links:[['温泉官方价格与购票','https://www.szechenyibath.hu/prices'],['温泉开放时间','https://www.szechenyibath.hu/opening-hours'],detailSources.fares]}],legs:[toVenue(),
+venueTaxi('venue-heroes','HUNGEXPO → 英雄广场：今天推荐打车省时间','hungexpo','heroes','道路约 6–8 km','约 25–40 分钟'),
+{id:'heroes-vajda',title:'英雄广场 → 沃伊达奇城堡外观',distance:'约 600–800 m',duration:'步行约 10–15 分钟',fare:'公园公共区域免费。',segments:[walkSeg('广场 → Városliget 公园 → 城堡外部',['heroes','vajda'],['在英雄广场拍照后朝背后的城市公园走，经开放的人行桥/步道前往 Vajdahunyad Castle。无需跨区坐车，注意公园里自行车道。'])]},
+{id:'vajda-bath',title:'城堡外观 → 塞切尼温泉入口',distance:'约 600–900 m，随票面入口变化',duration:'走路 10–15 分钟，额外留 15–20 分钟验票、更衣',fare:'温泉门票见今天购票卡。',segments:[walkSeg('公园 → Széchenyi Thermal Bath',['vajda','bath'],['往黄色大型温泉建筑走，先看电子票注明的 Entrance。普通现场票与在线票入口可能不同，地图标的是温泉建筑，不把建筑中心当成唯一门。','如果只到了温泉围墙外，按指示牌或问工作人员去票面入口，别沿围栏盲目绕圈。'])]},
+{id:'bath-hotel',title:'温泉 → 酒店：M1 + 4/6 路',distance:'M1 5 站 + 环路电车约 8 站；步行约 0.5–0.8 km',duration:'门到门预留 45–60 分钟',fare:'有效布达佩斯通票；单程票则地铁和电车各一张，共 1,000 HUF/人。',segments:[walkSeg('温泉出口 → Széchenyi fürdő M1',['bath','bathmetro'],['换好干衣再出门，到附近 Széchenyi fürdő 的黄色 M1 入口，步行约 250–450 米、4–7 分钟。']),metroSeg('M1：Vörösmarty tér 方向，到 Oktogon',['bathmetro','heroes','oktogon'],['车头 Vörösmarty tér；依次 Hősök tere、Bajza utca、Kodály körönd、Vörösmarty utca、Oktogon，5 站下。图中只标部分换乘参考点，不是删掉中间站。']),tramSeg('Oktogon → Boráros tér：4/6 路往南',['oktogon','blaha','rakoczi','harminc','corvin','mester','boraros46'],['出地铁跟 4/6 电车站牌，4 路车头 Újbuda-központ M 或 6 路车头 Móricz Zsigmond körtér M 都可；不要上 Széll Kálmán tér 方向。','依次经过 Király utca、Wesselényi utca、Blaha Lujza tér、Rákóczi tér、Harminckettesek tere、Corvin-negyed、Mester utca / Ferenc körút，再到 Boráros tér H，下车后约 3–5 分钟到酒店。'])],sources:[detailSources.network]}
+]};
+D['26']={notes:[['固定时段','你的 poster 09:00–10:30；论文编号、展板号和张贴时间仍看作者邮件。08:15 前尽量到，先找 Hall H 和自己的展板。'],['出门清单','badge、证件、充电宝、论文 PDF/二维码、30 秒介绍、2 分钟讲解；与一作提前约定谁讲什么、谁记录问题。'],['今天不加景点','上午自己的 poster、之后 D 场/展台/午餐约聊，晚上社交活动。把交流对象和想跟进的问题简短记录，别边讲边临时赶其他约。'],['社交活动返程','活动专页写 18:30 开门和晚餐，22:00 结束；总览曾写 19:00，以活动通知为准。离开前确认接驳末班；不想等或找不到接驳就按本页直接叫车回酒店。']],tickets:[{title:'今天只处理参会与交通',body:['自己的 poster 不需要购买旅游景点门票；会场和晚间活动凭你的注册资格与 badge，若注册类别有额外限制，以官方条款为准。','早晨建议出租车，约 07:15 酒店正门出发，目标 08:00–08:15 到。前一晚请前台预约，不把未知班距的接驳当作唯一赶场方法。','若当日公交，使用有效市区通票；完整站名与方向放在下面备用交通卡。'],links:[detailSources.conference,detailSources.social]}],legs:[venueTaxi('poster-morning','poster 当天：酒店 → HUNGEXPO，优先打车','hotel','hungexpo','道路约 8–11 km','早高峰留 35–55 分钟，另留找展板时间'),toVenue(),venueTaxi('social-return','Social Event 后：HUNGEXPO → 酒店','hungexpo','hotel','道路约 8–11 km','约 25–45 分钟；22:00 后按现场上车点')]
+};
+D['27']={notes:[['先退房再去玩','护照、机票、银行卡随身；大行李寄存酒店并拿好凭证。把 13:00 开始回酒店、15:15 左右离店设成闹钟。'],['上午会期的取舍','本路线主动放弃主会第三天上午。若想参加 F/G 场，就删国会与大教堂；12:30 左右结束参会，回酒店取行李，机场缓冲照留。'],['国会与机场','国会时段和票尚未买，没票就看外观；不临时排长队。返程目标 16:15–16:30 到机场，19:35 CA720，28 日 11:40 北京抵达。'],['拿行李前检查','手机、护照、钱包、充电线、海报/筒和寄存行李逐件确认。终端航站楼/值机区看航司通知，截图写机场 2B，不把旧图当当天柜台信息。']],tickets:[{title:'今天门票与机场交通票',body:['国会从官方购票说明进入 Jegymester，选 10/27 的合适语言和早间时段；按国籍/年龄选票，结账看实时价。中国护照且无其他适用资格一般用 non-EEA 档，付款方式按官方结账页；本轮未核实当日余票/价格。','圣伊什特万教堂可按教堂内部或含 Panorama/Treasury 的产品选票。实时价未核实，赶时间只看外观。不要把看国会外观也理解成必须买票。','若走 100E，机场票单独 2,500 HUF/人；27 日市区段还要有效市区票。24 日买的 72 小时票是否仍有效要看开始时间，不按日期三个字猜。有效成人月票等指定通票才有 1,000 HUF 机场附加票资格，普通 72 小时票不能套用。'],links:[['国会官方购票说明','https://www.parlament.hu/web/visitors/purchasing-tickets'],['Jegymester','https://jegymester.hu/production/480000/parlament-latogatas'],['教堂票站','https://www.bazilika.jegy.eu/'],detailSources.bkk]}],legs:[
+{id:'hotel-parliament',title:'酒店 → 国会游客中心：2 路往北',distance:'电车约 4.5–5 km；两头步行约 0.5–0.8 km',duration:'门到游客中心约 35–50 分钟，另提前 20–30 分钟安检',fare:fareSingle,segments:[hotelWalkOut,tramSeg('2 路：Jászai Mari tér 方向，游客中心站下',tramNorth,['Boráros tér H 上 2 路往 Jászai Mari tér，经 Zsil、Fővám、Március 15.、Vigadó、Eötvös、Széchenyi István、Kossuth Lajos tér，再到 Országház, látogatóközpont 下车，约 8 站。','车内看完整站名，látogatóközpont 意为游客中心。若现场运行只到 Kossuth Lajos tér，则在该站下车沿国会广场往北走，增加约 10 分钟。']),walkSeg('游客中心站 → 国会票面集合处',['visitorstop','parliament'],['按照票面和 Visitor Centre / Látogatóközpont 标志到游客中心，估计 200–400 米、3–6 分钟；不是从议员办公入口进。票面集合点优先。'])],sources:[detailSources.network]},
+{id:'parliament-shoes',title:'国会 → 多瑙河岸的鞋子',distance:'游客中心绕国会南行约 700–900 m',duration:'约 12–18 分钟',fare:'步行免费。',segments:[walkSeg('国会外公共步道 → 鞋子纪念雕塑',['parliament','shoes'],['参观结束回到公共广场，沿国会临河方向向南到鞋子纪念雕塑；使用指定通道上下河岸，注意临水和道路。','这是纪念地点，安静停留，不踩或站在雕塑上。'])]},
+{id:'shoes-basilica',title:'鞋子纪念雕塑 → 圣伊什特万大教堂',distance:'约 1.0–1.2 km',duration:'步行约 15–20 分钟',fare:'到广场免费，内部票另购。',segments:[walkSeg('河岸 → Zrínyi utca 一带 → 教堂广场',['shoes','basilica'],['从河岸按斑马线/人行通道回市区街道，向 Szent István tér、教堂穹顶方向走。街角拐弯用本卡步行导航，不沿车行河岸硬走。'])]},
+{id:'basilica-hotel',title:'大教堂午餐后 → 酒店取行李',distance:'走到 Vigadó 约 900–1,100 m；再坐电车 4 站',duration:'约 35–45 分钟；13:00 左右开始回程',fare:fareSingle,segments:[walkSeg('教堂广场 → Vigadó tér 电车站',['basilica','vigadostop'],['按步行导航经市中心公共街道回 Vigadó tér，约 15–20 分钟。不要逛到取行李闹钟响了才开始找路。']),tramSeg('2 路：Közvágóhíd H 方向',['vigadostop','marcius','fovam','zsil','boraros'],['Vigadó tér → Március 15. tér → Fővám tér → Zsil utca → Boráros tér H，4 站、约 8–12 分钟。']),hotelWalkBack],sources:[detailSources.network]},
+venueTaxi('hotel-airport-taxi','酒店 → 机场：返程推荐预约出租车','hotel','airport','道路约 19–23 km','15:15 左右出发，留 45–75 分钟，目标 16:15–16:30 到'),
+{id:'hotel-airport-public',title:'酒店 → 机场：100E 公交备选',distance:'先 2 路 2 站，再走约 600 m 到 Kálvin；100E 约 20–23 km',duration:'整体预留 90–105 分钟，建议约 14:30–14:45 离店',fare:'市区段有效票 + 100E 机场票 2,500 HUF/人。',segments:[hotelWalkOut,tramSeg('2 路往 Jászai Mari tér，到 Fővám',['boraros','zsil','fovam'],['带好所有行李，上车后 Zsil utca → Fővám tér，2 站下车。']),walkSeg('Fővám → Kálvin tér 的机场方向站台',['fovam','market','kalvin'],['沿 Vámház körút 从河边朝 Kálvin tér 走约 550–650 米、8–12 分钟。到广场后看 100E 站牌与车头 Liszt Ferenc Airport 2 / Repülőtér；机场方向上车点不保证与 22 日下车点在路同一侧。','具体站位、门号本轮未核实，按目的地方向认车，不凭“曾在这里下车”找同一块路沿。']),{mode:'bus',label:'100E：Liszt Ferenc Airport 2 方向',points:['kalvin','airport'],steps:['用有效机场票或按 100E Pay&GO 流程买票验证，坐到机场终点。估计 35–50 分钟，另留等车、堵车。','下车后看 Air China / CA720 当天显示屏找到航站楼与柜台，按航司要求值机、托运、安检和出境。若出门时交通异常、已落后缓冲，优先改正规出租车，不赌最后一班接驳。']}],sources:[detailSources.bkk]}
+]};
+trip.details=D;
+// Correct the earlier indirect public-transport instruction with a shorter, explicit transfer.
+trip.days.find(d=>d.id==='23').events[0][3]='默认酒店约 6–7 km 打车到 Budapest-Kelenföld，预留 20–30 分钟车程，再提前 30 分钟进站。公交备选为 Boráros tér 2 路北上到 Fővám tér，转 M4 到 Kelenföld；完整步骤及地图就在本日“逐段交通”。票面如为 Keleti，改看东站路线。';
+trip.days.find(d=>d.id==='22').events[0][3]='取完行李后按本日“落地 → 酒店”交通卡执行：100E 到 Kálvin tér，沿 Vámház körút 步行约 600 米到 Fővám tér，转 2 路南行 2 站到 Boráros tér，再走约 3–5 分钟进酒店。地图可分别放大每次换乘。';
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>(() => {
+ 'use strict';
+ const $=id=>document.getElementById(id), P=trip.places;
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const modes={walk:{name:'步行',color:'#616e69',dash:'2 7'},tram:{name:'电车',color:'#a96a07'},metro:{name:'地铁',color:'#268445'},bus:{name:'巴士 / 接驳',color:'#216dc3'},taxi:{name:'出租车',color:'#aa4052',dash:'7 6'}};
+ const placeURL=k=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(P[k].local);
+ function routeURL(points,mode){
+  const ps=points.map(k=>P[k].local),q=new URLSearchParams({api:'1',origin:ps[0],destination:ps[ps.length-1],travelmode:mode==='walk'?'walking':mode==='taxi'?'driving':'transit'});
+  // Google transit mode ignores waypoints; exact line and direction remain in this guide.
+  if(mode==='walk'&&ps.length>2)q.set('waypoints',ps.slice(1,-1).join('|'));
+  return 'https://www.google.com/maps/dir/?'+q;
+ }
+ const eventLegs={
+  22:['airport-hotel',null,'hotel-market','market-bridge','bridge-hotel','hotel-vigado','vigado-dock','dock-hotel'],
+  23:['hotel-kelenfold',null,'hbf-belvedere','belvedere-karl','karl-opera','opera-hofburg','hofburg-stephans',null,'stephans-hbf','return-station-hotel'],
+  24:['hotel-bastion',null,null,'bastion-castle','castle-chain','chain-venue',null,null,'venue-hotel'],
+  25:['hotel-venue',null,null,null,null,null,'venue-heroes','heroes-vajda','vajda-bath','bath-hotel'],
+  26:['poster-morning',null,null,null,null,null,null,null,null,null,'social-return'],
+  27:['hotel-parliament',null,'parliament-shoes','shoes-basilica',null,'basilica-hotel',null,'hotel-airport-taxi',null]
+ };
+ let day=trip.days[0],leg=null,map=null,layer=null,lastBounds=null,failedTiles=0;
+ const pins={};
+ function sourceHTML(sources=[]){return sources.length?'<div class="sources">来源：'+sources.map(x=>'<a href="'+esc(x[1])+'" target="_blank" rel="noopener">'+esc(x[0])+' ↗</a>').join('')+'</div>':'';}
+ if(typeof L!=='undefined'){
+  map=L.map('map',{scrollWheelZoom:false}).setView([47.49,19.06],13);
+  const tile=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+  tile.on('tileerror',()=>{if(++failedTiles>2)$('mapstatus').textContent='部分底图未加载；右侧步骤与官方票务仍可阅读，也可打开各段地图导航。';});
+  tile.on('tileload',()=>{$('mapstatus').textContent='';});layer=L.layerGroup().addTo(map);
+ }else $('mapstatus').textContent='地图库未加载。请联网刷新；各段 Google Maps 导航和文字步骤仍可使用。';
+ function segmentHTML(s,i,interactive=true){
+  const links='<a href="'+esc(routeURL(s.points,s.mode))+'" target="_blank" rel="noopener">'+(s.mode==='walk'?'步行导航':s.mode==='taxi'?'道路导航':'实时公交导航')+' ↗</a>';
+  return '<div class="stage"><div class="stage-top"><span class="mode">'+(i+1)+' · '+esc(modes[s.mode].name)+'</span><h4>'+esc(s.label)+'</h4></div><p class="stops">'+s.points.map(k=>esc(P[k].name)).join(' → ')+'</p><ol class="steps">'+s.steps.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ol><div class="stage-actions">'+(interactive?'<button type="button" data-stage="'+i+'">在图上放大这一段</button>':'')+links+'</div></div>';
+ }
+ function legHTML(l,interactive=true){return '<div class="route-head"><h3>'+esc(l.title)+'</h3><div class="meta"><span><strong>距离：</strong>'+esc(l.distance)+'</span><span><strong>用时：</strong>'+esc(l.duration)+'</span></div><p class="fare"><strong>车票 / 付款：</strong>'+esc(l.fare)+'</p></div>'+l.segments.map((s,i)=>segmentHTML(s,i,interactive)).join('')+sourceHTML(l.sources);}
+ function fit(keys){
+  if(!map||!keys.length)return;lastBounds=L.latLngBounds(keys.map(k=>P[k].ll));map.fitBounds(lastBounds,{padding:[45,45],maxZoom:16,animate:false});
+ }
+ function draw(l,focus=-1){
+  $('mapstages').innerHTML='<button type="button" data-stage="-1" aria-pressed="'+(focus===-1)+'">全段</button>'+(l?l.segments.map((s,i)=>'<button type="button" data-stage="'+i+'" aria-pressed="'+(focus===i)+'">'+(i+1)+' · '+esc(modes[s.mode].name)+'</button>').join(''):'');
+  $('maptitle').textContent=l?l.title:day.city+' · 当天景点总览';
+  $('mapcaption').textContent=l?'站点顺序连线图：彩色线连接乘车站点，点线连接步行换乘；未获取实测道路/轨道几何，不能沿直线穿行。点“步行导航”看实际拐弯。“分段放大”可看清机场到市区后的换乘。':'数字表示景点到访顺序；连线表示顺序，不是实测街道路线。23 日总览仅显示维也纳，酒店到火车站请在上方单独选择。';
+  if(!map)return;layer.clearLayers();Object.keys(pins).forEach(k=>delete pins[k]);let keys=[];
+  const drawSegments=l?(focus<0?l.segments:[l.segments[focus]]):day.segments.map(([a,b,m])=>({points:[a,b],mode:m==='walk'?'walk':'taxi'}));
+  drawSegments.forEach(s=>{
+   const m=modes[s.mode],pts=s.points.map(k=>P[k].ll);keys.push(...s.points);
+   L.polyline(pts,{color:m.color,weight:s.mode==='walk'?3:4,dashArray:m.dash||null,opacity:.9}).addTo(layer).bindTooltip(esc(s.label||'景点顺序'));
+  });
+  if(!l)keys=day.route.filter(k=>!(day.id==='27'&&k==='airport'));
+  const unique=[...new Set(keys)];
+  unique.forEach((k,i)=>{
+   const label=l?String(i+1):day.route.flatMap((p,j)=>p===k?[j+1]:[]).join('·');
+   const content='<strong>'+esc(P[k].name)+'</strong><p>附近位置示意；具体站台看车头方向与站牌。</p><a href="'+esc(placeURL(k))+'" target="_blank" rel="noopener">打开这个地点 ↗</a>';
+   pins[k]=L.marker(P[k].ll,{icon:L.divIcon({className:'map-number',html:label,iconSize:[28,28],iconAnchor:[14,14]}),title:P[k].name}).addTo(layer).bindPopup(content);
+  });fit(unique);
+ }
+ function chooseLeg(id,scroll=false){
+  leg=trip.details[day.id].legs.find(x=>x.id===id)||null;$('legselect').value=leg?leg.id:'overview';
+  if(leg)$('routedetail').innerHTML=legHTML(leg);
+  else $('routedetail').innerHTML='<div class="overview-card"><h3>当天的地点顺序</h3><p>'+esc(day.walk)+'</p><ol class="route-list">'+day.route.map(k=>'<li><a href="'+esc(placeURL(k))+'" target="_blank" rel="noopener">'+esc(P[k].name)+' ↗</a></li>').join('')+'</ol><p>要看怎么买票、从哪站上车，请从“你正在走哪一段”中选择对应路段。</p></div>';
+  draw(leg);if(scroll)$('travel').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function notesHTML(d){return trip.details[d.id].notes.map(([a,b])=>'<article class="note"><h3>'+esc(a)+'</h3><p>'+esc(b)+'</p></article>').join('');}
+ function ticketHTML(d){return trip.details[d.id].tickets.map(t=>'<article class="ticket"><h3>'+esc(t.title)+'</h3><ol>'+t.body.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><div class="ticket-links">'+(t.links||[]).map(([n,u])=>'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(n)+' ↗</a>').join('')+'</div></article>').join('');}
+ function eventsHTML(d){return d.events.map((e,i)=>{
+  const id=(eventLegs[d.id]||[])[i],exists=trip.details[d.id].legs.some(l=>l.id===id);
+  return '<article class="event"><time>'+esc(e[0])+'</time><div><h3>'+esc(e[2])+'</h3><p>'+esc(e[3])+'</p><div class="event-actions">'+(exists?'<button class="route-link" type="button" data-leg="'+id+'">怎么去：交通步骤 + 地图</button>':'')+'<a href="'+esc(placeURL(e[1]))+'" target="_blank" rel="noopener">地点 ↗</a></div></div></article>';
+ }).join('');}
+ function selectDay(d){
+  day=d;document.documentElement.style.setProperty('--active',d.color);document.querySelectorAll('#daynav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.day===d.id)));
+  $('daydate').textContent=d.date;$('daytitle').textContent=d.title;$('daywalk').textContent=d.walk;$('daynote').textContent=d.note;
+  $('events').innerHTML=eventsHTML(d);$('notes').innerHTML=notesHTML(d);$('ticketcontent').innerHTML=ticketHTML(d);
+  $('daylimits').textContent=d.id==='22'?'订单待核：酒店截图为 10 月 14–15 日搜索页，去程日期被裁切；本页按 22 日到达、住 Soroksári út 12 规划。距离和钟点为估计。':d.id==='23'?'铁路边界：还未核实 23 日具体可售车次、股道、票价和座位库存；先按实际火车票倒推出门时间。':d.id==='26'?'个人排期：09:00–10:30 来源于你提供的 poster 时间；论文编号、展板号和张贴规则仍以作者邮件为准。':'当天公共交通按常规线路规划，尚未核实出行日临时改线和接驳时刻；前一晚用 BudapestGO 和参会邮件检查。';
+  const det=trip.details[d.id];$('legselect').innerHTML='<option value="overview">当天景点总览</option>'+det.legs.map(l=>'<option value="'+esc(l.id)+'">'+esc(l.title)+'</option>').join('');
+  $('allroutecontent').innerHTML=det.legs.map(l=>'<article>'+legHTML(l,false)+'</article>').join('');$('allroutes').open=false;
+  chooseLeg(det.legs[0].id);
+  try{history.replaceState(null,'','#day='+d.id);}catch{}
+ }
+ $('daynav').innerHTML=trip.days.map(d=>'<button type="button" data-day="'+d.id+'" aria-pressed="false">10.'+d.id+'<span>'+({22:'落地 · 市内 · 船票',23:'到火车站 · 维也纳',24:'城堡 · 会场',25:'参会 · 温泉',26:'你的 poster · social',27:'市区 · 去机场'}[d.id])+'</span></button>').join('');
+ $('daynav').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(b)selectDay(trip.days.find(d=>d.id===b.dataset.day));});
+ $('legselect').addEventListener('change',e=>chooseLeg(e.target.value));
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(b&&leg){draw(leg,Number(b.dataset.stage));return;}const l=e.target.closest('[data-leg]');if(l)chooseLeg(l.dataset.leg,true);});
+ $('printall').innerHTML='<h1>EMNLP 2026 · 六天完整交通与行程</h1>'+trip.days.map(d=>'<article class="print-day"><h2>'+esc(d.date+' · '+d.title)+'</h2><p>'+esc(d.note)+'</p><h3>注意事项</h3><div class="notes">'+notesHTML(d)+'</div><h3>当天时间表</h3><div>'+eventsHTML(d)+'</div><h3>逐段交通</h3>'+trip.details[d.id].legs.map(l=>legHTML(l,false)).join('')+'<h3>门票与支付</h3>'+ticketHTML(d)+'</article>').join('');
+ const match=location.hash.match(/day=(\d+)/),initial=match&&trip.days.find(d=>d.id===match[1]);selectDay(initial||trip.days[0]);
+})();
+</script>
+</body></html>
