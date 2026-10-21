@@ -9,18 +9,28 @@
 @media(max-width:850px){main{padding:19px 16px 45px}h1{font-size:25px}.layout,.timeline,.notes{grid-template-columns:1fr}.map-panel{position:static}#map{height:390px}.days button{flex:1 1 27%;padding:7px 12px}.daybar{display:block}.chooser{grid-template-columns:1fr;gap:4px}.print{float:none;margin-bottom:9px}.section{margin-top:26px}.steps{font-size:15px}}@media(max-width:400px){main{padding:16px 11px}h1{font-size:23px}#map{height:340px}.event{grid-template-columns:84px minmax(0,1fr);gap:9px}.event time{font-size:12px}.stages button{min-height:40px}.chooser select{font-size:16px}.days button{min-height:60px}}
 @media print{body{background:white;color:#111}main{padding:0}header,.days,.daybar,.jumps,.chooser,.layout,.section,.footer,.print{display:none}.print-all{display:block}.print-all h1{display:block}.print-day{break-before:page}.print-day:first-of-type{break-before:auto}.print-day h2{display:block}.notes,.timeline{display:block}.event,.note,.stage,.ticket,.route-head{break-inside:avoid}.route-head{margin-top:22px}.stage-actions,.event-actions,.ticket-links{display:none}a{color:inherit}}
 .map-shortcuts{padding:0 0 13px;border-bottom:1px solid var(--line);margin-bottom:18px}.map-shortcuts[hidden]{display:none}.map-shortcuts button{font-size:13px;min-height:42px;padding:7px 12px}
+.food-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:25px;align-items:start}.food-map-panel{position:sticky;top:16px}#foodmap{height:490px;border-radius:12px;background:#e2e7dc;isolation:isolate}.food-choices{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}.food-choices button{font-size:14px;min-height:42px;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px}.food-choices button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.food-pin{background:#173c3a}.food-hotel-pin{background:#fff;color:#173c3a;border-color:#173c3a}.food-table{width:100%;border-collapse:collapse;font-size:14px}.food-table th,.food-table td{text-align:left;vertical-align:top;padding:10px 5px;border-bottom:1px solid var(--line)}.food-table th{font-size:12px;color:var(--muted);font-weight:500}.food-table button{border:0;background:transparent;padding:0;text-align:left;color:#09675e;text-decoration:underline;text-underline-offset:3px;font-size:14px}.food-small{font-size:13px;color:var(--muted)}.food-links{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;margin:14px 0}.food-detail .steps{font-size:14px}.food-detail h3{font-size:20px}.food-dish{font-size:14px;margin-bottom:10px}.food-facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}.food-facts strong{display:block;font-size:17px}.food-facts span{font-size:12px;color:var(--muted)}.food-hotel-key{display:inline-block;background:#fff;color:#173c3a;border:2px solid #173c3a;border-radius:20px;padding:0 6px;font-weight:600}.food-shop-key{display:inline-block;background:#173c3a;color:#fff;border-radius:20px;padding:1px 6px;font-weight:600}.food-print{margin-top:22px}
+@media(max-width:850px){.food-layout{grid-template-columns:1fr}.food-map-panel{position:static}#foodmap{height:390px}.food-detail .steps{font-size:15px}}@media(max-width:400px){#foodmap{height:340px}.food-table{font-size:13px}.food-table button{font-size:13px}.food-choices button{min-height:44px;padding:7px 10px}}
+@media print{#food{display:none}.food-print{break-before:page}.food-print article{break-inside:avoid;margin:20px 0}.food-facts{display:block}}
 </style>
 </head>
 <body><main>
 <header><button class="print" onclick="window.print()">打印六天完整手册 / 存为 PDF</button><div class="eyebrow">22–27 OCTOBER 2026 · EMNLP</div><h1>布达佩斯 × 维也纳 · 逐段出行手册</h1><p class="sub">从哪里上车、坐哪个方向、几站下车、怎么付钱，都放进当天。先选日期，再选你正在走的路段；地图与右侧步骤一起切换。</p></header>
 <nav class="days" id="daynav" aria-label="选择日期"></nav>
 <div class="daybar"><div><div class="eyebrow" id="daydate"></div><h2 id="daytitle"></h2></div><div class="sub" id="daywalk"></div></div>
-<nav class="jumps" aria-label="当天内容"><a href="#travel">逐段交通与地图</a><a href="#schedule">当天时间表</a><a href="#tickets">今天怎么买票</a><a href="#attention">今天的注意事项</a></nav>
+<nav class="jumps" aria-label="当天内容"><a href="#travel">逐段交通与地图</a><a href="#schedule">当天时间表</a><a href="#tickets">今天怎么买票</a><a href="#attention">今天的注意事项</a><a href="#food">美食地图 · 6 家店</a></nav>
 <section id="travel"><div class="chooser"><label for="legselect">你正在走哪一段</label><select id="legselect"></select></div><div class="stages map-shortcuts" id="mapshortcuts" aria-label="维也纳地图快捷入口" hidden></div><div class="layout"><div class="map-panel"><div class="map-title" id="maptitle"></div><div id="map" aria-label="所选路段的上车站、换乘站、下车站和线路连线"></div><div class="stages" id="mapstages" aria-label="分段放大"></div><div class="legend"><span><i class="walk"></i>步行</span><span><i class="tram"></i>电车</span><span><i class="metro"></i>地铁</span><span><i class="bus"></i>巴士/接驳</span><span><i class="taxi"></i>出租车</span></div><p class="caption" id="mapcaption"></p><p class="map-status" id="mapstatus" role="status"></p></div><div id="routedetail" aria-live="polite"></div></div></section>
 <section class="section" id="schedule"><h2>当天时间表</h2><p class="daily-note" id="daynote"></p><div class="timeline" id="events"></div></section>
 <section class="section" id="tickets"><h2>今天怎么买票、怎么付款</h2><div id="ticketcontent"></div></section>
 <section class="section" id="attention"><h2>今天的注意事项</h2><div class="notes" id="notes"></div><div class="highlight" id="daylimits"></div></section>
 <section class="section"><details class="all-routes" id="allroutes"><summary>展开今天所有交通步骤，连续阅读</summary><div id="allroutecontent"></div></details></section>
+<section class="section" id="food" aria-labelledby="foodheading">
+<h2 id="foodheading">布达佩斯美食地图</h2>
+<p class="sub">7 道美食、6 家店；③ 肉煎饼和 ⑦ 渔夫汤都对应 Puli &amp; Juhász。距离均从 ibis Styles Budapest City（Soroksári út 12）出发。</p>
+<div class="food-choices" id="foodchoices" aria-label="选择美食店"></div>
+<div class="food-layout"><div class="food-map-panel"><div class="map-title" id="foodmaptitle">酒店与六家美食店</div><div id="foodmap" aria-label="酒店和六家布达佩斯美食店的位置地图"></div><div class="legend"><span><span class="food-hotel-key">H</span> 酒店</span><span><span class="food-shop-key">①</span> 美食编号</span></div><p class="caption">点位按店铺地址标注；点击编号看从酒店出发的交通。实际拐弯、班次与临时改线请打开导航。</p><p class="map-status" id="foodmapstatus" role="status"></p></div><div class="food-detail" id="fooddetail" aria-live="polite"></div></div>
+<p class="food-small">核对日期：2026-10-21。步行距离为当时所选道路路线；公交参考用时含步行与换乘，出行日须重新查询。菜品对应来自你的收藏清单，未核实当日供应和价格。</p>
+</section>
 <div class="footer">交通说明核对至 2026-10-16；部分景点票价沿用 10 月 14 日的官网公开价，未锁价。距离和用时为规划估计，不含实时路况。点位为站点/建筑附近位置，出口号、精确站台、列车股道与展馆门以当天标识及票面为准。底图 © OpenStreetMap contributors；地图需联网，没有购票或代叫车。</div>
 <div class="print-all" id="printall"></div>
 </main>
@@ -379,6 +389,166 @@ trip.details=D;
 trip.days.find(d=>d.id==='23').events[0][3]='默认酒店约 6–7 km 打车到 Budapest-Kelenföld，预留 20–30 分钟车程，再提前 30 分钟进站。公交备选为 Boráros tér 2 路北上到 Fővám tér，转 M4 到 Kelenföld；完整步骤及地图就在本日“逐段交通”。票面如为 Keleti，改看东站路线。';
 trip.days.find(d=>d.id==='22').events[0][3]='取完行李后按本日“落地 → 酒店”交通卡执行：100E 到 Kálvin tér，沿 Vámház körút 步行约 600 米到 Fővám tér，转 2 路南行 2 站到 Boráros tér，再走约 3–5 分钟进酒店。地图可分别放大每次换乘。';
 </script>
+<script>const foodGuide = {
+  "checked": "2026-10-21",
+  "hotel": {
+    "name": "ibis Styles Budapest City",
+    "address": "Soroksári út 12",
+    "ll": [
+      47.4791429,
+      19.068545
+    ]
+  },
+  "overview_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Gundel+Restaurant%2C+Gundel+Karoly+ut+4%2C+Budapest&waypoints=Molnar%27s+Kurtoskalacs%2C+Vaci+utca+31%2C+Budapest%7CGerbeaud%2C+Vorosmarty+ter+7-8%2C+Budapest%7CRetro+Langos%2C+Bajcsy-Zsilinszky+ut+25%2C+Budapest%7CPuli+%26+Juhasz%2C+Dob+utca+19%2C+Budapest%7CGetto+Gulyas%2C+Wesselenyi+utca+18%2C+Budapest&travelmode=walking",
+  "stores": [
+    {
+      "id": "1",
+      "name": "Retro Lángos",
+      "address": "Bajcsy-Zsilinszky út 25",
+      "walk_km": 3.3,
+      "walk_min": 46,
+      "transit_min": 23,
+      "walking_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Retro+Langos%2C+Bajcsy-Zsilinszky+ut+25%2C+Budapest&travelmode=walking",
+      "transit_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Retro+Langos%2C+Bajcsy-Zsilinszky+ut+25%2C+Budapest&travelmode=transit",
+      "source": "https://retrolangos.hu/",
+      "marker": "①",
+      "label": "炸饼",
+      "dish": "Lángos · 兰戈什炸饼",
+      "note": "适合逛圣伊什特万大教堂一带时顺路去。选的是 Bajcsy-Zsilinszky út 25 店。",
+      "steps": [
+        "从酒店步行约 13 分钟、850 米到 Corvin-negyed 地铁站，找蓝色 M3。",
+        "乘 M3，方向看 Újpest-központ，坐 4 站到 Arany János utca。",
+        "出站后按步行导航走约 4 分钟、400 米，到 Bajcsy-Zsilinszky út 25。"
+      ],
+      "ll": [
+        47.5032271,
+        19.0552202
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Molnár’s Kürtőskalács",
+      "address": "Váci utca 31",
+      "walk_km": 2.1,
+      "walk_min": 30,
+      "transit_min": 16,
+      "walking_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Molnar%27s+Kurtoskalacs%2C+Vaci+utca+31%2C+Budapest&travelmode=walking",
+      "transit_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Molnar%27s+Kurtoskalacs%2C+Vaci+utca+31%2C+Budapest&travelmode=transit",
+      "source": "https://kurtoskalacs.com/hu/kapcsolat/",
+      "marker": "②",
+      "label": "烟囱卷",
+      "dish": "Chimney cake · 烟囱卷",
+      "note": "位于瓦茨街 Váci utca；可以和 Gerbeaud Café 安排在同一段市中心游览。",
+      "steps": [
+        "从酒店步行约 7 分钟、450 米到 Boráros tér H 的河岸电车站台。",
+        "乘 2 路，向市中心 / Jászai Mari tér 方向，坐 3 站到 Március 15. tér。",
+        "下车后按导航步行约 4 分钟、300 米，到 Váci utca 31。"
+      ],
+      "ll": [
+        47.4926471,
+        19.0530854
+      ]
+    },
+    {
+      "id": "3/7",
+      "name": "Puli & Juhász",
+      "address": "Dob utca 19",
+      "walk_km": 2.5,
+      "walk_min": 35,
+      "transit_min": 23,
+      "walking_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Puli+%26+Juhasz%2C+Dob+utca+19%2C+Budapest&travelmode=walking",
+      "transit_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Puli+%26+Juhasz%2C+Dob+utca+19%2C+Budapest&travelmode=transit",
+      "source": "https://www.diningcity.hu/restaurant/52274-puli_es_juhasz",
+      "marker": "③·⑦",
+      "label": "肉煎饼 / 鱼汤",
+      "dish": "Hortobágyi meat pancake · 肉煎饼 / Fisherman’s soup · 渔夫汤",
+      "note": "与 Gettó Gulyás 在同一片街区，可结合犹太区、Gozsdu 一带游览择一家用餐。",
+      "steps": [
+        "从酒店步行约 5 分钟、350 米到 Mester utca / Ferenc körút 电车站。",
+        "乘 4 或 6 路，方向看 Széll Kálmán tér M，坐 5 站到 Wesselényi utca / Erzsébet körút。",
+        "下车后步行约 11 分钟、850 米，到 Dob utca 19。"
+      ],
+      "ll": [
+        47.4979242,
+        19.0610514
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Gettó Gulyás",
+      "address": "Wesselényi utca 18",
+      "walk_km": 2.3,
+      "walk_min": 33,
+      "transit_min": 21,
+      "walking_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Getto+Gulyas%2C+Wesselenyi+utca+18%2C+Budapest&travelmode=walking",
+      "transit_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Getto+Gulyas%2C+Wesselenyi+utca+18%2C+Budapest&travelmode=transit",
+      "source": "https://gettogulyas.hu/",
+      "marker": "④",
+      "label": "牛肉汤",
+      "dish": "Goulash soup · 古拉什牛肉汤",
+      "note": "可结合犹太区游览；与 Puli & Juhász 同片街区，不必为了两家店分别往返酒店。",
+      "steps": [
+        "从酒店步行约 5 分钟、350 米到 Mester utca / Ferenc körút 电车站。",
+        "乘 4 或 6 路，方向看 Széll Kálmán tér M，坐 5 站到 Wesselényi utca / Erzsébet körút。",
+        "下车后步行约 9 分钟、650 米，到 Wesselényi utca 18。"
+      ],
+      "ll": [
+        47.4973807,
+        19.062396
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Gerbeaud Café",
+      "address": "Vörösmarty tér 7–8",
+      "walk_km": 2.6,
+      "walk_min": 37,
+      "transit_min": 18,
+      "walking_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Gerbeaud%2C+Vorosmarty+ter+7-8%2C+Budapest&travelmode=walking",
+      "transit_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Gerbeaud%2C+Vorosmarty+ter+7-8%2C+Budapest&travelmode=transit",
+      "source": "https://gerbeaud.hu/kapcsolat/",
+      "marker": "⑤",
+      "label": "多波什蛋糕",
+      "dish": "Dobos cake · 多波什蛋糕",
+      "note": "位于 Vörösmarty tér；适合逛瓦茨街、河岸步道时顺路，与 Molnár’s 一起看位置。",
+      "steps": [
+        "从酒店步行约 7 分钟、450 米到 Boráros tér H 的河岸电车站台。",
+        "乘 2 路（查询时也有 2B / 23），往市中心，坐 4 站到 Vigadó tér。",
+        "下车后步行约 4 分钟、300 米，到 Vörösmarty tér 7–8。"
+      ],
+      "ll": [
+        47.496964,
+        19.0502535
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Gundel Restaurant",
+      "address": "Gundel Károly út 4",
+      "walk_km": 5.1,
+      "walk_min": 71,
+      "transit_min": 33,
+      "walking_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Gundel+Restaurant%2C+Gundel+Karoly+ut+4%2C+Budapest&travelmode=walking",
+      "transit_url": "https://www.google.com/maps/dir/?api=1&origin=ibis+Styles+Budapest+City%2C+Soroksari+ut+12%2C+Budapest&destination=Gundel+Restaurant%2C+Gundel+Karoly+ut+4%2C+Budapest&travelmode=transit",
+      "source": "https://gundel.hu/en/",
+      "marker": "⑥",
+      "label": "奶油松糕",
+      "dish": "Somlói galuska · 索姆洛伊奶油松糕",
+      "note": "六家中离酒店最远，建议放在城市公园 / 英雄广场那天，不单独步行往返。",
+      "steps": [
+        "从酒店步行约 5 分钟到 Mester utca / Ferenc körút，乘 4 或 6 路，方向看 Széll Kálmán tér M。",
+        "坐 7 站到 Oktogon M，按站内标识步行约 3 分钟换 M1 地铁。",
+        "乘 M1，方向看 Mexikói út，坐 5 站到 Széchenyi fürdő。",
+        "出站后按导航步行约 5 分钟、400 米，到 Gundel Károly út 4。"
+      ],
+      "ll": [
+        47.5174462,
+        19.0772756
+      ]
+    }
+  ]
+};
+</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>(() => {
  'use strict';
@@ -449,7 +619,7 @@ trip.days.find(d=>d.id==='22').events[0][3]='取完行李后按本日“落地 �
   const id=(eventLegs[d.id]||[])[i],exists=trip.details[d.id].legs.some(l=>l.id===id);
   return '<article class="event"><time>'+esc(e[0])+'</time><div><h3>'+esc(e[2])+'</h3><p>'+esc(e[3])+'</p><div class="event-actions">'+(exists?'<button class="route-link" type="button" data-leg="'+id+'">怎么去：交通步骤 + 地图</button>':'')+'<a href="'+esc(placeURL(e[1]))+'" target="_blank" rel="noopener">地点 ↗</a></div></div></article>';
  }).join('');}
- function selectDay(d){
+ function selectDay(d,keepHash=false){
   day=d;document.documentElement.style.setProperty('--active',d.color);document.querySelectorAll('#daynav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.day===d.id)));
   $('daydate').textContent=d.date;$('daytitle').textContent=d.title;$('daywalk').textContent=d.walk;$('daynote').textContent=d.note;
   $('events').innerHTML=eventsHTML(d);$('notes').innerHTML=notesHTML(d);$('ticketcontent').innerHTML=ticketHTML(d);
@@ -458,14 +628,61 @@ trip.days.find(d=>d.id==='22').events[0][3]='取完行李后按本日“落地 �
   $('mapshortcuts').hidden=d.id!=='23';$('mapshortcuts').innerHTML=d.id==='23'?'<button type="button" data-leg="overview">维也纳全日地图</button><button type="button" data-leg="hbf-stephans">中央站 → 老城</button><button type="button" data-leg="opera-hbf">歌剧院 → 中央站</button><button type="button" data-leg="hotel-kelenfold">布达佩斯：酒店 → 火车站</button>':'';
   $('allroutecontent').innerHTML=det.legs.map(l=>'<article>'+legHTML(l,false)+'</article>').join('');$('allroutes').open=false;
   chooseLeg(d.defaultLeg||det.legs[0].id);
-  try{history.replaceState(null,'','#day='+d.id);}catch{}
+  if(!keepHash)try{history.replaceState(null,'','#day='+d.id);}catch{}
  }
  $('daynav').innerHTML=trip.days.map(d=>'<button type="button" data-day="'+d.id+'" aria-pressed="false">10.'+d.id+'<span>'+({22:'落地 · 市内 · 船票',23:'维也纳 · 博物馆优先',24:'城堡 · 会场',25:'参会 · 温泉',26:'你的 poster · social',27:'市区 · 去机场'}[d.id])+'</span></button>').join('');
  $('daynav').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(b)selectDay(trip.days.find(d=>d.id===b.dataset.day));});
  $('legselect').addEventListener('change',e=>chooseLeg(e.target.value));
  document.addEventListener('click',e=>{const o=e.target.closest('[data-overview-focus]');if(o&&!leg){draw(null,o.dataset.overviewFocus==='city'?1:-1);return;}const b=e.target.closest('[data-stage]');if(b&&leg){draw(leg,Number(b.dataset.stage));return;}const l=e.target.closest('[data-leg]');if(l)chooseLeg(l.dataset.leg,true);});
  $('printall').innerHTML='<h1>EMNLP 2026 · 六天完整交通与行程</h1>'+trip.days.map(d=>'<article class="print-day"><h2>'+esc(d.date+' · '+d.title)+'</h2><p>'+esc(d.note)+'</p><h3>注意事项</h3><div class="notes">'+notesHTML(d)+'</div><h3>当天时间表</h3><div>'+eventsHTML(d)+'</div><h3>逐段交通</h3>'+trip.details[d.id].legs.map(l=>legHTML(l,false)).join('')+'<h3>门票与支付</h3>'+ticketHTML(d)+'</article>').join('');
- const match=location.hash.match(/day=(\d+)/),initial=match&&trip.days.find(d=>d.id===match[1]);selectDay(initial||trip.days[0]);
+ const match=location.hash.match(/day=(\d+)/),initial=match&&trip.days.find(d=>d.id===match[1]);selectDay(initial||trip.days[0],location.hash==='#food');
+})();
+</script>
+<script>(() => {
+ 'use strict';
+ const root=document.getElementById('food');
+ const $=id=>document.getElementById(id);
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const stores=foodGuide.stores;
+ let foodMap=null,selected=null,failedTiles=0;
+ const markers=new Map();
+ const pinClass=s=>s?'map-number food-pin':'map-number food-hotel-pin';
+ const hotelURL='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(foodGuide.hotel.name+', '+foodGuide.hotel.address+', Budapest');
+ function links(s){return '<div class="food-links"><a href="'+esc(s.walking_url)+'" target="_blank" rel="noopener">从酒店步行导航 ↗</a><a href="'+esc(s.transit_url)+'" target="_blank" rel="noopener">从酒店公交导航 ↗</a><a href="'+esc(s.source)+'" target="_blank" rel="noopener">地址来源 ↗</a></div>';}
+ function detail(s){return '<h3>'+esc(s.marker+' '+s.name)+'</h3><p class="food-dish">'+esc(s.dish)+'</p><p class="food-small">'+esc(s.address+', Budapest')+'</p><div class="food-facts"><div><strong>'+esc(s.walk_km+' 公里 / '+s.walk_min+' 分钟')+'</strong><span>全程步行 · 从酒店出发</span></div><div><strong>约 '+esc(s.transit_min)+' 分钟</strong><span>公共交通 · 含步行与换乘</span></div></div><h4>从酒店怎么去</h4><ol class="steps">'+s.steps.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ol>'+links(s)+'<p class="food-small">顺路安排：'+esc(s.note)+'</p>';}
+ function overview(){return '<h3>从酒店出发 · 距离与用时</h3><table class="food-table"><thead><tr><th scope="col">店铺 / 美食</th><th scope="col">全程步行</th><th scope="col">公交参考</th></tr></thead><tbody>'+stores.map(s=>'<tr><td><button type="button" data-food="'+esc(s.id)+'">'+esc(s.marker+' '+s.name)+'</button><div class="food-small">'+esc(s.label)+'</div></td><td>'+esc(s.walk_km)+' 公里<br>'+esc(s.walk_min)+' 分钟</td><td>约 '+esc(s.transit_min)+' 分钟</td></tr>').join('')+'</tbody></table><div class="food-links"><a href="'+esc(foodGuide.overview_url)+'" target="_blank" rel="noopener">在 Google Maps 打开全部店铺 ↗</a></div><p class="food-small">总览用于看位置；每家店的交通从酒店单独计算，无需按清单一天吃完。</p>';}
+ function fit(store){
+  if(!foodMap)return;
+  const points=[foodGuide.hotel.ll,...(store?[store.ll]:stores.map(s=>s.ll))];
+  foodMap.invalidateSize({animate:false});
+  foodMap.fitBounds(L.latLngBounds(points),{padding:[42,42],maxZoom:15,animate:false});
+ }
+ function select(id,fromMarker=false){
+  selected=stores.find(s=>s.id===id)||null;
+  $('fooddetail').innerHTML=selected?detail(selected):overview();
+  $('foodmaptitle').textContent=selected?'酒店 → '+selected.name:'酒店与六家美食店';
+  $('foodchoices').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.food===(selected?selected.id:'all'))));
+  fit(selected);
+  if(foodMap&&(!selected||!fromMarker))foodMap.closePopup();
+ }
+ $('foodchoices').innerHTML='<button type="button" data-food="all" aria-pressed="true">全部店铺</button>'+stores.map(s=>'<button type="button" data-food="'+esc(s.id)+'" aria-pressed="false">'+esc(s.marker+' '+s.label)+'</button>').join('');
+ if(typeof L!=='undefined'){
+  foodMap=L.map('foodmap',{scrollWheelZoom:false}).setView(foodGuide.hotel.ll,13);
+  const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(foodMap);
+  tiles.on('tileerror',()=>{if(++failedTiles>2)$('foodmapstatus').textContent='部分底图未加载；店铺地址、交通步骤与导航链接仍可使用。';});
+  tiles.on('tileload',()=>{$('foodmapstatus').textContent='';});
+  L.marker(foodGuide.hotel.ll,{icon:L.divIcon({className:pinClass(false),html:'H',iconSize:[28,28],iconAnchor:[14,14]}),title:foodGuide.hotel.name}).addTo(foodMap).bindPopup('<strong>'+esc(foodGuide.hotel.name)+'</strong><p>'+esc(foodGuide.hotel.address)+'</p><a href="'+esc(hotelURL)+'" target="_blank" rel="noopener">打开酒店位置 ↗</a>');
+  stores.forEach(s=>{
+   const marker=L.marker(s.ll,{icon:L.divIcon({className:pinClass(true),html:esc(s.marker),iconSize:[s.id==='3/7'?44:28,28],iconAnchor:[s.id==='3/7'?22:14,14]}),title:s.marker+' '+s.name}).addTo(foodMap);
+   marker.bindPopup('<strong>'+esc(s.marker+' '+s.name)+'</strong><p>'+esc(s.label)+'<br>'+esc(s.address)+'</p><p>酒店步行 '+esc(s.walk_km)+' 公里 / '+esc(s.walk_min)+' 分钟<br>公交参考约 '+esc(s.transit_min)+' 分钟</p><a href="'+esc(s.transit_url)+'" target="_blank" rel="noopener">从酒店导航 ↗</a>');
+   marker.on('click',()=>select(s.id,true));markers.set(s.id,marker);
+  });
+ }else $('foodmapstatus').textContent='地图库未加载；请使用右侧地址与 Google Maps 导航。';
+ root.addEventListener('click',e=>{const b=e.target.closest('[data-food]');if(b)select(b.dataset.food);});
+ select('all');
+ const printFood=document.createElement('section');printFood.className='food-print';
+ printFood.innerHTML='<h2>布达佩斯美食 · 从酒店出发</h2><p>核对至 '+esc(foodGuide.checked)+'；交通用时为查询参考，菜品供应和价格以店内菜单为准。</p>'+stores.map(s=>'<article>'+detail(s)+'</article>').join('');
+ $('printall').appendChild(printFood);
 })();
 </script>
 </body></html>
